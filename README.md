@@ -1,1 +1,0 @@
-# techWeek25-frontend
