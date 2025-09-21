@@ -12,35 +12,23 @@ function Dashboard({ data }) {
     );
   }
 
-  const chartData = Object.entries(data.categories).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
   return (
     <div className="dashboard">
       <h2>Dashboard</h2>
-      <p><strong>Total Businesses:</strong> {data.totalBusinesses}</p>
+      <p><strong>Address:</strong> {data.address || "N/A"}</p>
+      <p><strong>Total Businesses:</strong> {data.totalBusinesses ?? 0}</p>
 
-      <PieChart width={300} height={250}>
-        <Pie
-          data={chartData}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          label={({ name, percent }) =>
-            `${name}: ${(percent * 100).toFixed(0)}%`
-          }
-          outerRadius={100}
-          dataKey="value"
-        >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+      {data.categories && Object.keys(data.categories).length > 0 ? (
+        <ul>
+          {Object.entries(data.categories).map(([name, value]) => (
+            <li key={name}>
+              {name}: {value}
+            </li>
           ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
+        </ul>
+      ) : (
+        <p>No business category data available yet.</p>
+      )}
     </div>
   );
 }
