@@ -61,8 +61,9 @@ function MapArea({ onAreaSelect }) {
 
     // ✅ Otherwise inject script
     const script = document.createElement("script");
+    const kakaoKey = process.env.REACT_APP_KAKAO_API_KEY;
     script.src =
-    "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&libraries=services&autoload=false";
+    "https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=services&autoload=false";
     script.async = true;
     script.onload = () => {
       console.log("✅ Kakao script loaded");
