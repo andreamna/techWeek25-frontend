@@ -1,8 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-
-// Use the same API URL everywhere
-const API_URL = "http://13.58.234.5:8080/api/v1/locations/analysis";
 
 const KAKAO_SDK_URL =
   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&autoload=false&libraries=services";
@@ -13,8 +9,17 @@ function MapArea({ onAreaSelect }) {
   const markerRef = useRef(null);
   const geocoderRef = useRef(null);
 
-  // Load SDK (with services) and init the map
+  const initOnceRef = useRef(false);
+  const onAreaSelectRef = useRef(onAreaSelect);
+
   useEffect(() => {
+    onAreaSelectRef.current = onAreaSelect;
+  }, [onAreaSelect]);
+
+  useEffect(() => {
+    if (initOnceRef.current) return; // StrictMode 중복 실행 방지
+    initOnceRef.current = true;
+
     const initMap = () => {
       const container = document.getElementById("map");
       const options = {
@@ -31,7 +36,7 @@ function MapArea({ onAreaSelect }) {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoderRef.current = geocoder;
 
-      // click on map → reverse geocode → send to backend
+      // 지도 클릭 → 역지오코딩 → 부모에 좌표 전달(POST는 부모가)
       window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
         const latlng = mouseEvent.latLng;
         marker.setPosition(latlng);
@@ -43,64 +48,77 @@ function MapArea({ onAreaSelect }) {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-
-              onAreaSelect?.(coords);
-
-              axios.post(API_URL, { lat: coords.lat, lng: coords.lng })
-                .catch((e) => console.error("POST failed:", e));
+              onAreaSelectRef.current?.(coords);
             }
           }
         );
       });
     };
 
-    // Already loaded with services?
+    // SDK 로딩
     if (window.kakao?.maps?.services) {
       window.kakao.maps.load(initMap);
-      return;
+    } else {
+      const script = document.createElement("script");
+      script.src = KAKAO_SDK_URL;
+      script.async = true;
+      script.onload = () => window.kakao?.maps && window.kakao.maps.load(initMap);
+      document.head.appendChild(script);
     }
+  }, []); // 의존성 없음!
 
-    // Not loaded or loaded without services → inject script
-    const script = document.createElement("script");
-    script.src = KAKAO_SDK_URL;
-    script.async = true;
-    script.onload = () => {
-      if (window.kakao?.maps) {
-        window.kakao.maps.load(initMap);
-      }
-    };
-    document.head.appendChild(script);
-  }, [onAreaSelect]);
-
-  // search handler (forward geocode)
   const handleSearch = () => {
     const geocoder = geocoderRef.current;
     const map = mapRef.current;
     const marker = markerRef.current;
 
-    if (!geocoder || !map || !marker || !searchInput) return;
+    if (!geocoder || !map || !marker || !searchInput.trim()) return;
 
-    geocoder.addressSearch(searchInput, (result, status) => {
-      if (status === window.kakao.maps.services.Status.OK && result[0]) {
-        const lat = parseFloat(result[0].y);
-        const lng = parseFloat(result[0].x);
-        const address =
-          result[0].road_address?.address_name || result[0].address?.address_name || searchInput;
-    
+    geocoder.addressSearch(
+      searchInput,
+      (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK && result.length) {
+          const r = result[0];
+          const lat = parseFloat(r.y);
+          const lng = parseFloat(r.x);
+          const address =
+            r.road_address?.address_name ||
+            r.address?.address_name ||
+            r.address_name ||
+            searchInput;
 
-        const latlng = new window.kakao.maps.LatLng(lat, lng);
-        map.setCenter(latlng);
-        marker.setPosition(latlng);
+          const latlng = new window.kakao.maps.LatLng(lat, lng);
+          map.setCenter(latlng);
+          marker.setPosition(latlng);
 
-        const coords = { lat, lng, address };
-        onAreaSelect?.(coords);
+          onAreaSelectRef.current?.({ lat, lng, address });
+        } else {
+          // 폴백: 키워드 검색
+          const ps = new window.kakao.maps.services.Places();
+          ps.keywordSearch(
+            searchInput,
+            (places, pStatus) => {
+              if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
+                const p = places[0];
+                const lat = parseFloat(p.y);
+                const lng = parseFloat(p.x);
+                const address = p.address_name || p.place_name || searchInput;
 
-        axios.post(API_URL, { lat: coords.lat, lng: coords.lng })
-          .catch((e) => console.error("POST failed:", e));
-      } else {
-        console.error("Address search failed:", status);
-      }
-    });
+                const latlng = new window.kakao.maps.LatLng(lat, lng);
+                map.setCenter(latlng);
+                marker.setPosition(latlng);
+
+                onAreaSelectRef.current?.({ lat, lng, address });
+              } else {
+                console.error("검색 결과가 없습니다.", status, pStatus);
+              }
+            },
+            { useMapBounds: false }
+          );
+        }
+      },
+      { analyzeType: "similar", size: 5 }
+    );
   };
 
   return (
@@ -112,6 +130,7 @@ function MapArea({ onAreaSelect }) {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           style={{ padding: 6, width: 260 }}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
         <button onClick={handleSearch} style={{ marginLeft: 8, padding: "6px 12px" }}>
           Search
@@ -120,12 +139,7 @@ function MapArea({ onAreaSelect }) {
 
       <div
         id="map"
-        style={{
-          width: "600px",
-          height: "400px",
-          borderRadius: 8,
-          border: "2px solid #c9a227",
-        }}
+        style={{ width: "600px", height: "400px", borderRadius: 8, border: "2px solid #c9a227" }}
       />
     </div>
   );

@@ -1,26 +1,34 @@
+// App.js
 import React, { useState } from "react";
 import axios from "axios";
 import Header from "./components/Header";
 import MapArea from "./components/MapArea";
 import Dashboard from "./components/Dashboard";
 
+const API_URL = "http://13.58.234.5:8080/api/v1/locations/analysis";
+const DEFAULT_RADIUS = 1000;
+
 function App() {
   const [businessData, setBusinessData] = useState(null);
 
   const handleAreaSelect = async (coords) => {
     try {
-      const response = await axios.post("http://13.58.234.5:8080/api/v1/locations/analysis", {
+      const response = await axios.post(API_URL, {
         lat: coords.lat,
         lng: coords.lng,
-        radius: 1000,
+        radius: DEFAULT_RADIUS,
       });
-  
+
       setBusinessData({
         ...response.data,
         address: coords.address,
       });
     } catch (error) {
-      console.error("Error fetching business data:", error);
+      console.error(
+        "Error fetching business data:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
       setBusinessData({
         totalBusinesses: 0,
         categories: {},
@@ -28,7 +36,6 @@ function App() {
       });
     }
   };
-  
 
   return (
     <div className="App">
