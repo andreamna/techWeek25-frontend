@@ -9,21 +9,18 @@ function App() {
 
   const handleAreaSelect = async (coords) => {
     try {
-      // Call backend API with lat/lng
-      const response = await axios.post("http://localhost:8080/api/businesses", {
+      const response = await axios.post("http://13.58.234.5:8080/api/v1/locations/analysis", {
         lat: coords.lat,
         lng: coords.lng,
         radius: 1000,
       });
-
-      // Merge backend result with address
+  
       setBusinessData({
         ...response.data,
-        address: coords.address, // add human-readable address
+        address: coords.address,
       });
     } catch (error) {
       console.error("Error fetching business data:", error);
-      // fallback if backend is down
       setBusinessData({
         totalBusinesses: 0,
         categories: {},
@@ -31,6 +28,7 @@ function App() {
       });
     }
   };
+  
 
   return (
     <div className="App">

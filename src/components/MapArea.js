@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
+// Use the same API URL everywhere
+const API_URL = "http://13.58.234.5:8080/api/v1/locations/analysis";
+
 const KAKAO_SDK_URL =
   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&autoload=false&libraries=services";
 
@@ -37,18 +40,14 @@ function MapArea({ onAreaSelect }) {
           latlng.getLng(),
           latlng.getLat(),
           (result, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
-              const address = result[0]?.address?.address_name ?? "";
+            if (status === window.kakao.maps.services.Status.OK && result[0]) {
+              const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-              // notify parent
+
               onAreaSelect?.(coords);
-              
-                axios.post("/api/v1/locations/analysis", {
-                  lat: coords.lat,
-                  lng: coords.lng,
-                
-                
-              }).catch((e) => console.error("POST failed:", e));
+
+              axios.post(API_URL, { lat: coords.lat, lng: coords.lng })
+                .catch((e) => console.error("POST failed:", e));
             }
           }
         );
@@ -61,7 +60,7 @@ function MapArea({ onAreaSelect }) {
       return;
     }
 
-    // Not loaded or loaded without services → inject the correct one
+    // Not loaded or loaded without services → inject script
     const script = document.createElement("script");
     script.src = KAKAO_SDK_URL;
     script.async = true;
@@ -71,9 +70,6 @@ function MapArea({ onAreaSelect }) {
       }
     };
     document.head.appendChild(script);
-
-    // cleanup (remove listeners if you add any outside kakao)
-    return () => {};
   }, [onAreaSelect]);
 
   // search handler (forward geocode)
@@ -84,12 +80,13 @@ function MapArea({ onAreaSelect }) {
 
     if (!geocoder || !map || !marker || !searchInput) return;
 
-    // Best results with **Korean** addresses (도로명/지번/구).
     geocoder.addressSearch(searchInput, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK && result[0]) {
         const lat = parseFloat(result[0].y);
         const lng = parseFloat(result[0].x);
-        const address = result[0].address?.address_name ?? searchInput;
+        const address =
+          result[0].road_address?.address_name || result[0].address?.address_name || searchInput;
+    
 
         const latlng = new window.kakao.maps.LatLng(lat, lng);
         map.setCenter(latlng);
@@ -98,10 +95,10 @@ function MapArea({ onAreaSelect }) {
         const coords = { lat, lng, address };
         onAreaSelect?.(coords);
 
-        axios.post("http://13.58.234.5:8080/api/v1/locations/analysis", {
-          lat: coords.lat,
-          lng: coords.lng,
-        }).catch((e) => console.error("POST failed:", e));
+        axios.post(API_URL, { lat: coords.lat, lng: coords.lng })
+          .catch((e) => console.error("POST failed:", e));
+      } else {
+        console.error("Address search failed:", status);
       }
     });
   };
@@ -111,7 +108,7 @@ function MapArea({ onAreaSelect }) {
       <div style={{ marginBottom: 10 }}>
         <input
           type="text"
-          placeholder="주소 또는 구를 입력 (한국어 권장)"
+          placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           style={{ padding: 6, width: 260 }}
