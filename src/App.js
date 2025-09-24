@@ -19,11 +19,8 @@ function App() {
         longitude: coords.lng,
         radius: DEFAULT_RADIUS,
       });
+      console.log("Backend response:", response.data);
 
-      setBusinessData({
-        ...response.data,
-        address: coords.address,
-      });
     } catch (error) {
       console.error(
         "Error fetching business data:",
@@ -31,8 +28,8 @@ function App() {
         error.response?.data || error.message
       );
       setBusinessData({
-        totalBusinesses: response.data.data.totalCount,
-        categories: response.data.data.categoryCounts,
+        totalBusinesses: response.data.totalCount ?? response.data.data?.totalCount ?? 0,
+        categories: response.data.categoryCounts ?? response.data.data?.categoryCounts ?? {},
         address: coords.address,
       });
     }
