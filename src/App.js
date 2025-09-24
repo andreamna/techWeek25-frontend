@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import MapArea from "./components/MapArea";
 import Dashboard from "./components/Dashboard";
 
-const API_URL = "/api/v1/locations/analysis";
+const API_URL = "http://13.58.234.5:8080/api/v1/locations/analysis";
 
 const DEFAULT_RADIUS = 1000;
 
