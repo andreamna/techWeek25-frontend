@@ -17,7 +17,7 @@ function Dashboard({ data }) {
   const categories = data.categoryCounts || {};
 
   // Prepare chart data
-  const chartData = Object.entries(categories).map(([name, value]) => ({
+  const chartData = Object.entries(data.categoryCounts || {}).map(([name, value]) => ({
     name,
     value,
   }));
@@ -26,7 +26,7 @@ function Dashboard({ data }) {
     <div className="dashboard">
       <h2>Dashboard</h2>
       <p><strong>Address:</strong> {data.address || "N/A"}</p>
-      <p><strong>Total Businesses:</strong> {totalBusinesses}</p>
+      <p><strong>Total Businesses:</strong> {data.totalCount ?? 0}</p>
 
       {chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
