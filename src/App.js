@@ -13,6 +13,7 @@ function App() {
   const [businessData, setBusinessData] = useState(null);
 
   const handleAreaSelect = async (coords) => {
+    console.log("In handleAreaSelect: " + coords + "Radius" + DEFAULT_RADIUS);
     try {
       const response = await axios.post(API_URL, {
         lat: coords.lat,
