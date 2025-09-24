@@ -12,8 +12,12 @@ function Dashboard({ data }) {
     );
   }
 
+  // Map backend fields correctly
+  const totalBusinesses = data.totalCount ?? 0;
+  const categories = data.categoryCounts || {};
+
   // Prepare chart data
-  const chartData = Object.entries(data.categories || {}).map(([name, value]) => ({
+  const chartData = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
   }));
@@ -22,7 +26,7 @@ function Dashboard({ data }) {
     <div className="dashboard">
       <h2>Dashboard</h2>
       <p><strong>Address:</strong> {data.address || "N/A"}</p>
-      <p><strong>Total Businesses:</strong> {data.totalBusinesses ?? 0}</p>
+      <p><strong>Total Businesses:</strong> {totalBusinesses}</p>
 
       {chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
