@@ -5,13 +5,15 @@ import Header from "./components/Header";
 import MapArea from "./components/MapArea";
 import Dashboard from "./components/Dashboard";
 
-const API_URL = "http://13.58.234.5:8080/api/v1/locations/analysis";
+const API_URL = "/api/v1/locations/analysis";
+
 const DEFAULT_RADIUS = 1000;
 
 function App() {
   const [businessData, setBusinessData] = useState(null);
 
   const handleAreaSelect = async (coords) => {
+    console.log("Hello, from my console!");
     try {
       const response = await axios.post(API_URL, {
         latitude: coords.lat,
@@ -19,20 +21,18 @@ function App() {
         radius: DEFAULT_RADIUS,
       });
 
-      console.log("✅ Backend response:", response.data);
+      console.log(response.data);
 
-      // ✅ Set state with backend response
       setBusinessData({
-        totalBusinesses: response.data.data.totalCount,
-        categories: response.data.data.categoryCounts,
+        ...response.data,
         address: coords.address,
       });
-
     } catch (error) {
-      console.error("❌ Error fetching business data:", error.response?.status);
-      console.error("❌ Error details:", error.response?.data || error.message);
-
-      // fallback if error
+      console.error(
+        "Error fetching business data:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
       setBusinessData({
         totalBusinesses: 0,
         categories: {},
