@@ -31,8 +31,8 @@ function App() {
         error.response?.data || error.message
       );
       setBusinessData({
-        totalBusinesses: 0,
-        categories: {},
+        totalBusinesses: response.data.totalCount,
+        categories: response.data.categoryCounts,
         address: coords.address,
       });
     }
