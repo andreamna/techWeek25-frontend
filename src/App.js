@@ -28,8 +28,8 @@ function App() {
         error.response?.data || error.message
       );
       setBusinessData({
-        totalBusinesses: response.data.totalCount ?? response.data.data?.totalCount ?? 0,
-        categories: response.data.categoryCounts ?? response.data.data?.categoryCounts ?? {},
+        totalBusinesses: response.data.data.totalCount,
+        categories: response.data.data.categoryCounts,
         address: coords.address,
       });
     }
