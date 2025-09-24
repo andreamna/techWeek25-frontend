@@ -16,9 +16,11 @@ function MapArea({ onAreaSelect }) {
     onAreaSelectRef.current = onAreaSelect;
   }, [onAreaSelect]);
 
-  useEffect(() => {
-    if (initOnceRef.current) return; // StrictMode 중복 실행 방지
+useEffect(() => {
+    if (initOnceRef.current) return;
     initOnceRef.current = true;
+
+    let mapInstance = null; // Temporary variable to hold the map instance
 
     const initMap = () => {
       const container = document.getElementById("map");
@@ -28,6 +30,7 @@ function MapArea({ onAreaSelect }) {
       };
 
       const map = new window.kakao.maps.Map(container, options);
+      mapInstance = map; // Store the instance
       mapRef.current = map;
 
       const marker = new window.kakao.maps.Marker({ map });
@@ -65,6 +68,16 @@ function MapArea({ onAreaSelect }) {
       script.onload = () => window.kakao?.maps && window.kakao.maps.load(initMap);
       document.head.appendChild(script);
     }
+
+    // ✨ THE FIX IS HERE ✨
+    // This function will run when the component unmounts
+    return () => {
+      if (mapInstance) {
+        // We remove all event listeners from the map to prevent "ghost" listeners
+        window.kakao.maps.event.removeListener(mapInstance, "click");
+      }
+    };
+
   }, []); // 의존성 없음!
 
   const handleSearch = () => {
