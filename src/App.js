@@ -16,8 +16,8 @@ function App() {
     console.log("In handleAreaSelect: " + coords.lat +", " + coords.lng + "Radius" + DEFAULT_RADIUS);
     try {
       const response = await axios.post(API_URL, {
-        lat: coords.lat,
-        lng: coords.lng,
+        latitude: coords.lat,
+        longitude: coords.lng,
         radius: DEFAULT_RADIUS,
       });
 
