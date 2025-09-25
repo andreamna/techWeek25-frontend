@@ -6,7 +6,7 @@ const KAKAO_SDK_URL =
 
 function MapArea({ onAreaSelect }) {
   const [searchInput, setSearchInput] = useState("");
-  const [businessInput, setBusinessInput] = useState(""); 
+  const [businessInput, setBusinessInput] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -52,7 +52,7 @@ function MapArea({ onAreaSelect }) {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-              onAreaSelectRef.current?.(coords, businessInput); 
+              onAreaSelectRef.current?.(coords, businessInput);
             }
           }
         );
@@ -125,20 +125,29 @@ function MapArea({ onAreaSelect }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 10, display: "flex", gap: "8px", alignItems: "flex-start" }}>
-        
+      {/* Inputs Row */}
+      <div
+        style={{
+          marginBottom: 10,
+          display: "flex",
+          gap: "8px",
+          alignItems: "flex-start",
+          width: "100%",
+          maxWidth: "600px",
+        }}
+      >
         {/* Address Input */}
         <input
           type="text"
           placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{ padding: 6, width: 220 }}
+          style={{ padding: 6, width: "220px" }}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
 
         {/* Business Input with Autocomplete */}
-        <div style={{ position: "relative", flex: "0 0 220px" }}>
+        <div style={{ position: "relative", width: "220px" }}>
           <input
             type="text"
             placeholder="업종 입력 (예: 카페, 치킨)"
@@ -157,7 +166,7 @@ function MapArea({ onAreaSelect }) {
                 border: "1px solid #ccc",
                 maxHeight: "150px",
                 overflowY: "auto",
-                zIndex: 1000,
+                zIndex: 2000, // 🔥 ensures it's above the map
                 listStyle: "none",
                 padding: 0,
                 margin: 0,
@@ -189,7 +198,13 @@ function MapArea({ onAreaSelect }) {
       {/* Map */}
       <div
         id="map"
-        style={{ width: "600px", height: "400px", borderRadius: 8, border: "2px solid #c9a227" }}
+        style={{
+          width: "600px",
+          height: "400px",
+          borderRadius: 8,
+          border: "2px solid #c9a227",
+          zIndex: 1,
+        }}
       />
     </div>
   );
