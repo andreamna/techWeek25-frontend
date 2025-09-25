@@ -93,7 +93,7 @@ function MapArea({ onAreaSelect }) {
           const latlng = new window.kakao.maps.LatLng(lat, lng);
           map.setCenter(latlng);
           marker.setPosition(latlng);
-          const coords = {lat, lng, address};
+          const coords = {lat: latlng.getLat(), lng: latlng.getLng(), address};
 
           onAreaSelectRef.current?.(coords, businessInput || null);
         }
