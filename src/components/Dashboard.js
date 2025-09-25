@@ -1,84 +1,155 @@
-import { useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+// components/Dashboard.js
+import { useMemo, useState } from "react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  PieChart,
+  Pie,
+  Legend,
+} from "recharts";
 
-const COLORS = ["#c9a227", "#8d6e63", "#6d4c41", "#d7ccc8", "#9c6644", "#deb887"];
+const BAR_COLORS = ["#22d3ee", "#3b82f6", "#3DDC97", "#facc15", "#f97316"];
+const PIE_COLORS = ["#22d3ee", "#3b82f6", "#3DDC97", "#facc15", "#f97316"];
 
 function Dashboard({ data }) {
   const [showAll, setShowAll] = useState(false);
+  const [chartType, setChartType] = useState("bar"); // toggle bar/pie
 
-  if (!data) {
-    return (
-      <div className="dashboard">
-        <h2>Dashboard</h2>
-        <p>No area selected yet.</p>
-      </div>
-    );
-  }
+  const total = data?.totalCount ?? 0;
+  const categories = data?.categoryCounts ?? {};
 
-  const totalBusinesses = data.totalCount ?? 0;
-  const categories = data.categoryCounts || {};
+  const sorted = useMemo(
+    () => Object.entries(categories).sort((a, b) => b[1] - a[1]),
+    [categories]
+  );
 
-  // Sort categories by value (descending)
-  const sortedCategories = Object.entries(categories).sort((a, b) => b[1] - a[1]);
-
-  // ✅ Only top 5 go into the pie chart
-  const topCategories = sortedCategories.slice(0, 5).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  const top5 = useMemo(
+    () => sorted.slice(0, 5).map(([name, value]) => ({ name, value })),
+    [sorted]
+  );
 
   return (
-    <div className="dashboard">
-      <h2>Dashboard</h2>
-      <p><strong>Address:</strong> {data.address || "N/A"}</p>
-      <p><strong>Total Businesses:</strong> {totalBusinesses}</p>
+    <section className="dash">
+      <div className="cards">
+        {/* Metric Card */}
+        <div className="card glass metric">
+          <div className="metric-label">Total Businesses</div>
+          <div className="metric-value">{total.toLocaleString()}</div>
 
-      {topCategories.length > 0 ? (
-        <>
-          <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-            Top 5 Business Categories
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={topCategories}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={90}
-                fill="#c9a227"
-                label
-              >
-                {topCategories.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend layout="vertical" align="right" verticalAlign="middle" />
-            </PieChart>
-          </ResponsiveContainer>
-        </>
-      ) : (
-        <p>No business category data available yet.</p>
-      )}
-
-      {/* Toggle full list */}
-      <button 
-        onClick={() => setShowAll(!showAll)} 
-        style={{ marginTop: "10px", padding: "6px 12px", cursor: "pointer" }}
-      >
-        {showAll ? "Hide all" : "Show all"}
-      </button>
-
-      {showAll && (
-        <div style={{ maxHeight: "200px", overflowY: "auto", marginTop: "10px" }}>
-          <ul>
-            {sortedCategories.map(([name, value]) => (
-              <li key={name}>{name}: {value}</li>
-            ))}
-          </ul>
+          {/* Spark mini bar */}
+          <div className="spark">
+            <ResponsiveContainer width="100%" height={50}>
+              <BarChart data={top5}>
+                <Bar
+                  dataKey="value"
+                  fill="#3b82f6"
+                  radius={[3, 3, 0, 0]}
+                  isAnimationActive={true}
+                  animationDuration={800}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Chart Card */}
+        <div className="card glass">
+          <div className="card-title">
+            Top 5 Categories
+            <button
+              onClick={() =>
+                setChartType((prev) => (prev === "bar" ? "pie" : "bar"))
+              }
+              className="btn-ghost"
+              style={{ marginLeft: "10px" }}
+            >
+              Switch to {chartType === "bar" ? "Pie" : "Bar"}
+            </button>
+          </div>
+
+          {top5.length > 0 ? (
+            <div className="chart-wrap">
+              <ResponsiveContainer width="100%" height={280}>
+                {chartType === "bar" ? (
+                  <BarChart
+                    data={top5}
+                    layout="vertical"
+                    margin={{ left: 40, right: 20 }}
+                  >
+                    <XAxis type="number" />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={120}
+                      tick={{ fontSize: 13, fill: "#e5e7eb" }}
+                    />
+                    <Tooltip />
+                    <Bar
+                      dataKey="value"
+                      radius={[4, 4, 0, 0]}
+                      isAnimationActive={true}
+                      animationDuration={800}
+                    >
+                      {top5.map((_, i) => (
+                        <Cell
+                          key={`bar-${i}`}
+                          fill={BAR_COLORS[i % BAR_COLORS.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                ) : (
+                  <PieChart>
+                    <Pie
+                      data={top5}
+                      dataKey="value"
+                      nameKey="name"
+                      outerRadius={90}
+                      label
+                    >
+                      {top5.map((_, i) => (
+                        <Cell
+                          key={`cell-${i}`}
+                          fill={PIE_COLORS[i % PIE_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                )}
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="muted">No category data yet.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Full List */}
+      <div className="card glass">
+        <button className="btn-ghost" onClick={() => setShowAll((s) => !s)}>
+          {showAll ? "Hide full list" : "Show full list"}
+        </button>
+        {showAll && (
+          <div className="list-wrap">
+            <ul className="kv">
+              {sorted.map(([name, value]) => (
+                <li key={name}>
+                  <span>{name}</span>
+                  <b>{value.toLocaleString()}</b>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

@@ -1,10 +1,11 @@
+// components/MapArea.js
 import React, { useEffect, useRef, useState } from "react";
-import categories from "../data/categories"; 
+import categories from "../data/categories";
 
 const KAKAO_SDK_URL =
   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&autoload=false&libraries=services";
 
-function MapArea({ onAreaSelect }) {
+function MapArea({ onAreaSelect, radius, setRadius }) {
   const [searchInput, setSearchInput] = useState("");
   const [businessInput, setBusinessInput] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -29,14 +30,8 @@ function MapArea({ onAreaSelect }) {
 
     const initMap = () => {
       const container = document.getElementById("map");
-      const defaultCenter = new window.kakao.maps.LatLng(37.5665, 126.9780); // fallback: Seoul
-
-      const options = {
-        center: defaultCenter,
-        level: 5,
-      };
-
-      const map = new window.kakao.maps.Map(container, options);
+      const defaultCenter = new window.kakao.maps.LatLng(37.5665, 126.9780);
+      const map = new window.kakao.maps.Map(container, { center: defaultCenter, level: 5 });
       mapInstance = map;
       mapRef.current = map;
 
@@ -46,37 +41,21 @@ function MapArea({ onAreaSelect }) {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoderRef.current = geocoder;
 
-      // ✅ Try geolocation for initial map center
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
-            const locPosition = new window.kakao.maps.LatLng(lat, lng);
-
-            map.setCenter(locPosition);
-            marker.setPosition(locPosition);
-
-            geocoder.coord2Address(
-              lng,
-              lat,
-              (result, status) => {
-                if (status === window.kakao.maps.services.Status.OK && result[0]) {
-                  const address = result[0].address?.address_name ?? "N/A";
-                  const coords = { lat, lng, address };
-                }
-              }
-            );
+            const loc = new window.kakao.maps.LatLng(lat, lng);
+            map.setCenter(loc);
+            marker.setPosition(loc);
           },
-          () => {
-            console.warn("Geolocation permission denied, using default Seoul center.");
-          }
+          () => console.warn("Geolocation denied; fallback to default.")
         );
       }
 
-      // Map click → get coords → send to parent
-      window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
-        const latlng = mouseEvent.latLng;
+      window.kakao.maps.event.addListener(map, "click", (e) => {
+        const latlng = e.latLng;
         marker.setPosition(latlng);
 
         geocoder.coord2Address(
@@ -93,7 +72,6 @@ function MapArea({ onAreaSelect }) {
       });
     };
 
-    // Load SDK
     if (window.kakao?.maps?.services) {
       window.kakao.maps.load(initMap);
     } else {
@@ -111,89 +89,74 @@ function MapArea({ onAreaSelect }) {
     };
   }, []);
 
-const handleSearch = () => {
-  const geocoder = geocoderRef.current;
-  const map = mapRef.current;
-  const marker = markerRef.current;
+  const handleSearch = () => {
+    const geocoder = geocoderRef.current;
+    const map = mapRef.current;
+    const marker = markerRef.current;
 
-  if (!geocoder || !map || !marker || !searchInput.trim()) return;
+    if (!geocoder || !map || !marker || !searchInput.trim()) return;
 
-  // 🔹 Try addressSearch first
-  geocoder.addressSearch(
-    searchInput,
-    (result, status) => {
-      if (status === window.kakao.maps.services.Status.OK && result.length) {
-        const r = result[0];
-        const lat = parseFloat(r.y);
-        const lng = parseFloat(r.x);
-        const address =
-          r.road_address?.address_name ||
-          r.address?.address_name ||
-          r.address_name ||
-          searchInput;
+    geocoder.addressSearch(
+      searchInput,
+      (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK && result.length) {
+          const r = result[0];
+          const lat = parseFloat(r.y);
+          const lng = parseFloat(r.x);
+          const address =
+            r.road_address?.address_name ||
+            r.address?.address_name ||
+            r.address_name ||
+            searchInput;
 
-        const latlng = new window.kakao.maps.LatLng(lat, lng);
-        map.setCenter(latlng);
-        marker.setPosition(latlng);
+          const latlng = new window.kakao.maps.LatLng(lat, lng);
+          map.setCenter(latlng);
+          marker.setPosition(latlng);
 
-        const coords = { lat, lng, address };
-
-        if (businessInput && businessInput.trim() !== "") {
-          onAreaSelectRef.current?.(coords, businessInput);
-        } else {
-          const confirmSend = window.confirm(
-            "Only address inputted.\nShow general business data for this area?"
-          );
-          if (confirmSend) {
+          const coords = { lat, lng, address };
+          if (businessInput && businessInput.trim() !== "") {
+            onAreaSelectRef.current?.(coords, businessInput);
+          } else {
             onAreaSelectRef.current?.(coords, null);
           }
-        }
-      } else {
-        // 🔹 fallback: keywordSearch
-        const ps = new window.kakao.maps.services.Places();
-        ps.keywordSearch(
-          searchInput,
-          (places, pStatus) => {
-            if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
-              const p = places[0];
-              const lat = parseFloat(p.y);
-              const lng = parseFloat(p.x);
-              const address = p.address_name || p.place_name || searchInput;
+        } else {
+          const ps = new window.kakao.maps.services.Places();
+          ps.keywordSearch(
+            searchInput,
+            (places, pStatus) => {
+              if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
+                const p = places[0];
+                const lat = parseFloat(p.y);
+                const lng = parseFloat(p.x);
+                const address = p.address_name || p.place_name || searchInput;
 
-              const latlng = new window.kakao.maps.LatLng(lat, lng);
-              map.setCenter(latlng);
-              marker.setPosition(latlng);
+                const latlng = new window.kakao.maps.LatLng(lat, lng);
+                map.setCenter(latlng);
+                marker.setPosition(latlng);
 
-              const coords = { lat, lng, address };
-
-              if (businessInput && businessInput.trim() !== "") {
-                onAreaSelectRef.current?.(coords, businessInput);
-              } else {
-                const confirmSend = window.confirm(
-                  "Only address inputted.\nShow general business data for this area?"
-                );
-                if (confirmSend) {
+                const coords = { lat, lng, address };
+                if (businessInput && businessInput.trim() !== "") {
+                  onAreaSelectRef.current?.(coords, businessInput);
+                } else {
                   onAreaSelectRef.current?.(coords, null);
                 }
+              } else {
+                console.error("검색 결과가 없습니다.");
               }
-            } else {
-              console.error("검색 결과가 없습니다 (address + keyword).", status, pStatus);
-            }
-          },
-          { useMapBounds: false }
-        );
-      }
-    },
-    { analyzeType: "similar", size: 5 }
-  );
-};
+            },
+            { useMapBounds: false }
+          );
+        }
+      },
+      { analyzeType: "similar", size: 5 }
+    );
+  };
 
-  // Autocomplete logic
+  // Autocomplete
   const handleBusinessChange = (e) => {
     const value = e.target.value;
     setBusinessInput(value);
-
-    if (value.trim() === "") {
+    if (!value.trim()) {
       setFilteredCategories([]);
       setShowSuggestions(false);
     } else {
@@ -211,62 +174,33 @@ const handleSearch = () => {
   };
 
   return (
-    <div>
-      {/* Inputs Row */}
-      <div
-        style={{
-          marginBottom: 10,
-          display: "flex",
-          gap: "8px",
-          alignItems: "center",
-        }}
-      >
-        {/* Address Input */}
+    <section className="sidebar">
+      <div className="panel glass">
+        <div className="panel-title">Search Area</div>
+
+        <label className="label">Address or Location</label>
         <input
           type="text"
-          placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          placeholder="e.g., 부산대학교 or 구/동"
+          className="input"
         />
 
-        {/* Business Input with Autocomplete */}
-        <div style={{ position: "relative", width: "220px" }}>
+        <label className="label">Business Category (optional)</label>
+        <div className="autocomplete">
           <input
             type="text"
-            placeholder="업종 입력 (예: 카페, 치킨)"
             value={businessInput}
             onChange={handleBusinessChange}
-            style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
+            placeholder="e.g., 카페, 치킨"
+            className="input"
           />
           {showSuggestions && filteredCategories.length > 0 && (
-            <ul
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                background: "white",
-                border: "1px solid #ccc",
-                maxHeight: "150px",
-                overflowY: "auto",
-                zIndex: 1000,
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-              }}
-            >
+            <ul className="autocomplete-list">
               {filteredCategories.map((cat, idx) => (
-                <li
-                  key={idx}
-                  onClick={() => handleSuggestionClick(cat)}
-                  style={{
-                    padding: "6px",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
+                <li key={idx} className="autocomplete-item" onClick={() => handleSuggestionClick(cat)}>
                   {cat}
                 </li>
               ))}
@@ -274,26 +208,24 @@ const handleSearch = () => {
           )}
         </div>
 
-        {/* Search Button */}
-        <button
-          onClick={handleSearch}
-          style={{ padding: "4px 10px", height: "32px", cursor: "pointer" }}
-        >
-          Search
-        </button>
+        <label className="label">Radius: <b>{radius.toLocaleString()} m</b></label>
+        <input
+          type="range"
+          min="300"
+          max="3000"
+          step="100"
+          value={radius}
+          onChange={(e) => setRadius(Number(e.target.value))}
+          className="range"
+        />
+
+        <button onClick={handleSearch} className="btn-primary">SEARCH</button>
       </div>
 
-      {/* Map */}
-      <div
-        id="map"
-        style={{
-          width: "600px",
-          height: "400px",
-          borderRadius: 8,
-          border: "2px solid #c9a227",
-        }}
-      />
-    </div>
+      <div className="map-wrap neon">
+        <div id="map" className="map-canvas" />
+      </div>
+    </section>
   );
 }
 
