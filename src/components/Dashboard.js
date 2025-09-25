@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#c9a227", "#8d6e63", "#6d4c41", "#d7ccc8", "#9c6644", "#deb887"];
 
 function Dashboard({ data }) {
+  const [showAll, setShowAll] = useState(false);
+
   if (!data) {
     return (
       <div className="dashboard">
@@ -12,12 +15,14 @@ function Dashboard({ data }) {
     );
   }
 
-  // Map backend fields correctly
   const totalBusinesses = data.totalCount ?? 0;
   const categories = data.categoryCounts || {};
 
-  // Prepare chart data
-  const chartData = Object.entries(data.categoryCounts || {}).map(([name, value]) => ({
+  // Sort categories by value (descending)
+  const sortedCategories = Object.entries(categories).sort((a, b) => b[1] - a[1]);
+
+  // Only top 5 for chart
+  const topCategories = sortedCategories.slice(0, 5).map(([name, value]) => ({
     name,
     value,
   }));
@@ -26,20 +31,20 @@ function Dashboard({ data }) {
     <div className="dashboard">
       <h2>Dashboard</h2>
       <p><strong>Address:</strong> {data.address || "N/A"}</p>
-      <p><strong>Total Businesses:</strong> {data.totalCount ?? 0}</p>
+      <p><strong>Total Businesses:</strong> {totalBusinesses}</p>
 
-      {chartData.length > 0 ? (
+      {topCategories.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={chartData}
+              data={topCategories}
               dataKey="value"
               nameKey="name"
               outerRadius={120}
               fill="#c9a227"
               label
             >
-              {chartData.map((entry, index) => (
+              {topCategories.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -49,6 +54,24 @@ function Dashboard({ data }) {
         </ResponsiveContainer>
       ) : (
         <p>No business category data available yet.</p>
+      )}
+
+      {/* Toggle full list */}
+      <button 
+        onClick={() => setShowAll(!showAll)} 
+        style={{ marginTop: "10px", padding: "6px 12px", cursor: "pointer" }}
+      >
+        {showAll ? "Hide all" : "Show all"}
+      </button>
+
+      {showAll && (
+        <div style={{ maxHeight: "200px", overflowY: "auto", marginTop: "10px" }}>
+          <ul>
+            {sortedCategories.map(([name, value]) => (
+              <li key={name}>{name}: {value}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
