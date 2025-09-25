@@ -19,6 +19,7 @@ function App() {
         latitude: coords.lat,
         longitude: coords.lng,
         radius: DEFAULT_RADIUS,
+        businessType: businessType || null,
       });
 
       console.log(response.data);
@@ -26,6 +27,7 @@ function App() {
       setBusinessData({
         ...response.data,
         address: coords.address,
+        requestedBusiness: businessType || error.message
       });
     } catch (error) {
       console.error(
@@ -37,6 +39,7 @@ function App() {
         totalBusinesses: 0,
         categories: {},
         address: coords.address,
+        requestedBusiness: businessType || null,
       });
     }
   };
