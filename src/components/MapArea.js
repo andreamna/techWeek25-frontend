@@ -56,6 +56,17 @@ function MapArea({ onAreaSelect }) {
 
             map.setCenter(locPosition);
             marker.setPosition(locPosition);
+
+            geocoder.coord2Address(
+              lng,
+              lat,
+              (result, status) => {
+                if (status === window.kakao.maps.services.Status.OK && result[0]) {
+                  const address = result[0].address?.address_name ?? "N/A";
+                  const coords = { lat, lng, address };
+                }
+              }
+            );
           },
           () => {
             console.warn("Geolocation permission denied, using default Seoul center.");
