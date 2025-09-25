@@ -44,7 +44,7 @@ function Dashboard({ data }) {
                 data={topCategories}
                 dataKey="value"
                 nameKey="name"
-                outerRadius={120}
+                outerRadius={100}
                 fill="#c9a227"
                 label
               >
@@ -53,7 +53,7 @@ function Dashboard({ data }) {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend layout="vertical" align="right" verticalAlign="middle" />
             </PieChart>
           </ResponsiveContainer>
         </>
