@@ -111,62 +111,82 @@ function MapArea({ onAreaSelect }) {
     };
   }, []);
 
-  const handleSearch = () => {
-    const geocoder = geocoderRef.current;
-    const map = mapRef.current;
-    const marker = markerRef.current;
+const handleSearch = () => {
+  const geocoder = geocoderRef.current;
+  const map = mapRef.current;
+  const marker = markerRef.current;
 
-    if (!geocoder || !map || !marker || !searchInput.trim()) return;
+  if (!geocoder || !map || !marker || !searchInput.trim()) return;
 
-    // Try addressSearch first
-    geocoder.addressSearch(
-      searchInput,
-      (result, status) => {
-        if (status === window.kakao.maps.services.Status.OK && result.length) {
-          const r = result[0];
-          const lat = parseFloat(r.y);
-          const lng = parseFloat(r.x);
-          const address =
-            r.road_address?.address_name ||
-            r.address?.address_name ||
-            r.address_name ||
-            searchInput;
+  // 🔹 Try addressSearch first
+  geocoder.addressSearch(
+    searchInput,
+    (result, status) => {
+      if (status === window.kakao.maps.services.Status.OK && result.length) {
+        const r = result[0];
+        const lat = parseFloat(r.y);
+        const lng = parseFloat(r.x);
+        const address =
+          r.road_address?.address_name ||
+          r.address?.address_name ||
+          r.address_name ||
+          searchInput;
 
-          const latlng = new window.kakao.maps.LatLng(lat, lng);
-          map.setCenter(latlng);
-          marker.setPosition(latlng);
+        const latlng = new window.kakao.maps.LatLng(lat, lng);
+        map.setCenter(latlng);
+        marker.setPosition(latlng);
 
-          const coords = { lat, lng, address };
-          onAreaSelectRef.current?.(coords, businessInput || null);
+        const coords = { lat, lng, address };
+
+        if (businessInput && businessInput.trim() !== "") {
+          onAreaSelectRef.current?.(coords, businessInput);
         } else {
-          // 🔹 fallback: keywordSearch
-          const ps = new window.kakao.maps.services.Places();
-          ps.keywordSearch(
-            searchInput,
-            (places, pStatus) => {
-              if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
-                const p = places[0];
-                const lat = parseFloat(p.y);
-                const lng = parseFloat(p.x);
-                const address = p.address_name || p.place_name || searchInput;
-
-                const latlng = new window.kakao.maps.LatLng(lat, lng);
-                map.setCenter(latlng);
-                marker.setPosition(latlng);
-
-                const coords = { lat, lng, address };
-                onAreaSelectRef.current?.(coords, businessInput || null);
-              } else {
-                console.error("검색 결과가 없습니다 (address + keyword).", status, pStatus);
-              }
-            },
-            { useMapBounds: false }
+          const confirmSend = window.confirm(
+            "Only address inputted.\nShow general business data for this area?"
           );
+          if (confirmSend) {
+            onAreaSelectRef.current?.(coords, null);
+          }
         }
-      },
-      { analyzeType: "similar", size: 5 }
-    );
-  };
+      } else {
+        // 🔹 fallback: keywordSearch
+        const ps = new window.kakao.maps.services.Places();
+        ps.keywordSearch(
+          searchInput,
+          (places, pStatus) => {
+            if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
+              const p = places[0];
+              const lat = parseFloat(p.y);
+              const lng = parseFloat(p.x);
+              const address = p.address_name || p.place_name || searchInput;
+
+              const latlng = new window.kakao.maps.LatLng(lat, lng);
+              map.setCenter(latlng);
+              marker.setPosition(latlng);
+
+              const coords = { lat, lng, address };
+
+              if (businessInput && businessInput.trim() !== "") {
+                onAreaSelectRef.current?.(coords, businessInput);
+              } else {
+                const confirmSend = window.confirm(
+                  "Only address inputted.\nShow general business data for this area?"
+                );
+                if (confirmSend) {
+                  onAreaSelectRef.current?.(coords, null);
+                }
+              }
+            } else {
+              console.error("검색 결과가 없습니다 (address + keyword).", status, pStatus);
+            }
+          },
+          { useMapBounds: false }
+        );
+      }
+    },
+    { analyzeType: "similar", size: 5 }
+  );
+};
 
   // Autocomplete logic
   const handleBusinessChange = (e) => {
