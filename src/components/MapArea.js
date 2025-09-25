@@ -52,7 +52,11 @@ function MapArea({ onAreaSelect }) {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-              onAreaSelectRef.current?.(coords, businessInput);
+              if (businessInput && businessInput.trim() !== "") {
+                onAreaSelectRef.current?.(coords, businessInput);
+              } else {
+                onAreaSelectRef.current?.(coords);
+              }
             }
           }
         );
@@ -94,7 +98,11 @@ function MapArea({ onAreaSelect }) {
           map.setCenter(latlng);
           marker.setPosition(latlng);
 
-          onAreaSelectRef.current?.({ lat, lng, address }, businessInput);
+          if (businessInput && businessInput.trim() !== "") {
+            onAreaSelectRef.current?.({ lat, lng, address }, businessInput);
+          } else {
+            onAreaSelectRef.current?.({ lat, lng, address });
+          }
         }
       },
       { analyzeType: "similar", size: 5 }
