@@ -6,11 +6,9 @@ const KAKAO_SDK_URL =
 
 function MapArea({ onAreaSelect }) {
   const [searchInput, setSearchInput] = useState("");
-  const [businessInput, setBusinessInput] = useState(""); // ✅ new state
+  const [businessInput, setBusinessInput] = useState(""); 
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-
-
 
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -54,7 +52,7 @@ function MapArea({ onAreaSelect }) {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-              onAreaSelectRef.current?.(coords, businessInput); // ✅ pass businessInput too
+              onAreaSelectRef.current?.(coords, businessInput); 
             }
           }
         );
@@ -96,14 +94,14 @@ function MapArea({ onAreaSelect }) {
           map.setCenter(latlng);
           marker.setPosition(latlng);
 
-          onAreaSelectRef.current?.({ lat, lng, address }, businessInput); // ✅ include businessInput
+          onAreaSelectRef.current?.({ lat, lng, address }, businessInput);
         }
       },
       { analyzeType: "similar", size: 5 }
     );
   };
 
-  // ✅ business autocomplete logic
+  // ✅ autocomplete logic
   const handleBusinessChange = (e) => {
     const value = e.target.value;
     setBusinessInput(value);
@@ -115,7 +113,7 @@ function MapArea({ onAreaSelect }) {
       const filtered = categories.filter((cat) =>
         cat.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredCategories(filtered.slice(0, 8)); // show top 8 matches
+      setFilteredCategories(filtered.slice(0, 8));
       setShowSuggestions(true);
     }
   };
@@ -127,7 +125,8 @@ function MapArea({ onAreaSelect }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 10, display: "flex", gap: "8px", flexWrap: "nowrap"}}>
+      <div style={{ marginBottom: 10, display: "flex", gap: "8px", alignItems: "flex-start" }}>
+        
         {/* Address Input */}
         <input
           type="text"
@@ -139,13 +138,13 @@ function MapArea({ onAreaSelect }) {
         />
 
         {/* Business Input with Autocomplete */}
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", flex: "0 0 220px" }}>
           <input
             type="text"
             placeholder="업종 입력 (예: 카페, 치킨)"
             value={businessInput}
             onChange={handleBusinessChange}
-            style={{ padding: 6, width: 220 }}
+            style={{ padding: 6, width: "100%" }}
           />
           {showSuggestions && filteredCategories.length > 0 && (
             <ul
@@ -182,7 +181,7 @@ function MapArea({ onAreaSelect }) {
         </div>
 
         {/* Search Button */}
-        <button onClick={handleSearch} style={{ padding: "6px 12px" }}>
+        <button onClick={handleSearch} style={{ padding: "6px 12px", height: "36px" }}>
           Search
         </button>
       </div>
