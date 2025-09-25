@@ -188,7 +188,7 @@ function MapArea({ onAreaSelect }) {
         </div>
 
         {/* Search Button */}
-        <button onClick={handleSearch} style={{ padding: "6px 12px", height: "38px", boxSizing: "border-box", cursor: "pointer" }}>
+        <button onClick={handleSearch} style={{ padding: "4px 10px", height: "32px", boxSizing: "border-box", cursor: "pointer", alignSelf: "center" }}>
           Search
         </button>
       </div>
