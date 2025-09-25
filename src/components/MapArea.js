@@ -22,7 +22,7 @@ function MapArea({ onAreaSelect }) {
   }, [onAreaSelect]);
 
   useEffect(() => {
-    if (initOnceRef.current) return; // prevent duplicate init
+    if (initOnceRef.current) return;
     initOnceRef.current = true;
 
     let mapInstance = null;
@@ -79,7 +79,7 @@ function MapArea({ onAreaSelect }) {
         window.kakao.maps.event.removeListener(mapInstance, "click");
       }
     };
-  }, []); // ✅ no businessInput dependency
+  }, []);
 
   const handleSearch = () => {
     const geocoder = geocoderRef.current;
@@ -88,6 +88,7 @@ function MapArea({ onAreaSelect }) {
 
     if (!geocoder || !map || !marker || !searchInput.trim()) return;
 
+    // Try addressSearch first
     geocoder.addressSearch(
       searchInput,
       (result, status) => {
@@ -108,7 +109,29 @@ function MapArea({ onAreaSelect }) {
           const coords = { lat, lng, address };
           onAreaSelectRef.current?.(coords, businessInput || null);
         } else {
-          console.error("검색 결과가 없습니다.", status);
+          // 🔹 fallback: keywordSearch
+          const ps = new window.kakao.maps.services.Places();
+          ps.keywordSearch(
+            searchInput,
+            (places, pStatus) => {
+              if (pStatus === window.kakao.maps.services.Status.OK && places.length) {
+                const p = places[0];
+                const lat = parseFloat(p.y);
+                const lng = parseFloat(p.x);
+                const address = p.address_name || p.place_name || searchInput;
+
+                const latlng = new window.kakao.maps.LatLng(lat, lng);
+                map.setCenter(latlng);
+                marker.setPosition(latlng);
+
+                const coords = { lat, lng, address };
+                onAreaSelectRef.current?.(coords, businessInput || null);
+              } else {
+                console.error("검색 결과가 없습니다 (address + keyword).", status, pStatus);
+              }
+            },
+            { useMapBounds: false }
+          );
         }
       },
       { analyzeType: "similar", size: 5 }
@@ -127,7 +150,7 @@ function MapArea({ onAreaSelect }) {
       const filtered = categories.filter((cat) =>
         cat.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredCategories(filtered.slice(0, 8)); // top 8 matches
+      setFilteredCategories(filtered.slice(0, 8));
       setShowSuggestions(true);
     }
   };
