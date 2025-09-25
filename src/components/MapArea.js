@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import categories from "../data/categories"; // ✅ import your categories
+import categories from "../data/categories"; // ✅ categories list
 
 const KAKAO_SDK_URL =
   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&autoload=false&libraries=services";
@@ -22,8 +22,10 @@ function MapArea({ onAreaSelect }) {
   }, [onAreaSelect]);
 
   useEffect(() => {
-    if (initOnceRef.current) return;
+    if (initOnceRef.current) return; // prevent duplicate init
     initOnceRef.current = true;
+
+    let mapInstance = null;
 
     const initMap = () => {
       const container = document.getElementById("map");
@@ -33,6 +35,7 @@ function MapArea({ onAreaSelect }) {
       };
 
       const map = new window.kakao.maps.Map(container, options);
+      mapInstance = map;
       mapRef.current = map;
 
       const marker = new window.kakao.maps.Marker({ map });
@@ -41,7 +44,7 @@ function MapArea({ onAreaSelect }) {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoderRef.current = geocoder;
 
-      // 지도 클릭 → 역지오코딩 → 부모에 좌표 전달
+      // Map click → get coords → send to parent
       window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
         const latlng = mouseEvent.latLng;
         marker.setPosition(latlng);
@@ -52,11 +55,7 @@ function MapArea({ onAreaSelect }) {
           (result, status) => {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
-              const coords = {
-                lat: latlng.getLat(),
-                lng: latlng.getLng(),
-                address,
-              };
+              const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
               onAreaSelectRef.current?.(coords, businessInput || null);
             }
           }
@@ -64,18 +63,23 @@ function MapArea({ onAreaSelect }) {
       });
     };
 
-    // SDK 로딩
+    // Load SDK
     if (window.kakao?.maps?.services) {
       window.kakao.maps.load(initMap);
     } else {
       const script = document.createElement("script");
       script.src = KAKAO_SDK_URL;
       script.async = true;
-      script.onload = () =>
-        window.kakao?.maps && window.kakao.maps.load(initMap);
+      script.onload = () => window.kakao?.maps && window.kakao.maps.load(initMap);
       document.head.appendChild(script);
     }
-  }, []); // ✅ runs only once
+
+    return () => {
+      if (mapInstance) {
+        window.kakao.maps.event.removeListener(mapInstance, "click");
+      }
+    };
+  }, []); // ✅ no businessInput dependency
 
   const handleSearch = () => {
     const geocoder = geocoderRef.current;
@@ -111,7 +115,7 @@ function MapArea({ onAreaSelect }) {
     );
   };
 
-  // ✅ autocomplete logic
+  // Autocomplete logic
   const handleBusinessChange = (e) => {
     const value = e.target.value;
     setBusinessInput(value);
@@ -123,7 +127,7 @@ function MapArea({ onAreaSelect }) {
       const filtered = categories.filter((cat) =>
         cat.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredCategories(filtered.slice(0, 8));
+      setFilteredCategories(filtered.slice(0, 8)); // top 8 matches
       setShowSuggestions(true);
     }
   };
@@ -140,7 +144,7 @@ function MapArea({ onAreaSelect }) {
         style={{
           marginBottom: 10,
           display: "flex",
-          gap: "10px",
+          gap: "8px",
           alignItems: "center",
         }}
       >
@@ -150,12 +154,7 @@ function MapArea({ onAreaSelect }) {
           placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{
-            padding: 6,
-            width: "220px",
-            height: "38px",
-            boxSizing: "border-box",
-          }}
+          style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
 
@@ -166,12 +165,7 @@ function MapArea({ onAreaSelect }) {
             placeholder="업종 입력 (예: 카페, 치킨)"
             value={businessInput}
             onChange={handleBusinessChange}
-            style={{
-              padding: 6,
-              width: "220px",
-              height: "38px",
-              boxSizing: "border-box",
-            }}
+            style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
           />
           {showSuggestions && filteredCategories.length > 0 && (
             <ul
@@ -210,12 +204,7 @@ function MapArea({ onAreaSelect }) {
         {/* Search Button */}
         <button
           onClick={handleSearch}
-          style={{
-            padding: "4px 10px",
-            height: "32px",
-            boxSizing: "border-box",
-            cursor: "pointer",
-          }}
+          style={{ padding: "4px 10px", height: "32px", cursor: "pointer" }}
         >
           Search
         </button>
@@ -229,7 +218,6 @@ function MapArea({ onAreaSelect }) {
           height: "400px",
           borderRadius: 8,
           border: "2px solid #c9a227",
-          zIndex: 1,
         }}
       />
     </div>
