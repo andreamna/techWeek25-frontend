@@ -44,7 +44,7 @@ function Dashboard({ data }) {
                 data={topCategories}
                 dataKey="value"
                 nameKey="name"
-                outerRadius={100}
+                outerRadius={90}
                 fill="#c9a227"
                 label
               >
