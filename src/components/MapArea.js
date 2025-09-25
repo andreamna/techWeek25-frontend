@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import categories from "../data/categories"; // ✅ categories list
+import categories from "../data/categories"; 
 
 const KAKAO_SDK_URL =
   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=372e542b613b1ef7e025788b17820c92&autoload=false&libraries=services";
@@ -29,8 +29,10 @@ function MapArea({ onAreaSelect }) {
 
     const initMap = () => {
       const container = document.getElementById("map");
+      const defaultCenter = new window.kakao.maps.LatLng(37.5665, 126.9780); // fallback: Seoul
+
       const options = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780), // Seoul
+        center: defaultCenter,
         level: 5,
       };
 
@@ -43,6 +45,35 @@ function MapArea({ onAreaSelect }) {
 
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoderRef.current = geocoder;
+
+      // ✅ Try geolocation for initial map center
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const locPosition = new window.kakao.maps.LatLng(lat, lng);
+
+            map.setCenter(locPosition);
+            marker.setPosition(locPosition);
+
+            geocoder.coord2Address(
+              lng,
+              lat,
+              (result, status) => {
+                if (status === window.kakao.maps.services.Status.OK && result[0]) {
+                  const address = result[0].address?.address_name ?? "N/A";
+                  const coords = { lat, lng, address };
+                  onAreaSelectRef.current?.(coords, businessInput || null);
+                }
+              }
+            );
+          },
+          () => {
+            console.warn("Geolocation permission denied, using default Seoul center.");
+          }
+        );
+      }
 
       // Map click → get coords → send to parent
       window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
