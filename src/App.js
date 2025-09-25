@@ -6,40 +6,43 @@ import MapArea from "./components/MapArea";
 import Dashboard from "./components/Dashboard";
 
 const API_URL = "/api/v1/locations/analysis";
-
 const DEFAULT_RADIUS = 1000;
 
 function App() {
   const [businessData, setBusinessData] = useState(null);
 
-  const handleAreaSelect = async (coords) => {
-    console.log("Hello, from my console!");
+  // Now accepts coords and optional businessType
+  const handleAreaSelect = async (coords, businessType = "") => {
     try {
-      const response = await axios.post(API_URL, {
+      // build request payload dynamically
+      const payload = {
         latitude: coords.lat,
         longitude: coords.lng,
         radius: DEFAULT_RADIUS,
-        businessType: businessType || null,
-      });
+      };
 
-      console.log(response.data);
+      if (businessType && businessType.trim() !== "") {
+        payload.businessType = businessType;
+      }
+
+      const response = await axios.post(API_URL, payload);
+
+      console.log("Backend response:", response.data);
 
       setBusinessData({
         ...response.data,
         address: coords.address,
-        requestedBusiness: businessType || error.message
       });
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Error fetching business data:",
-        error.response?.status,
-        error.response?.data || error.message
+        err.response?.status,
+        err.response?.data || err.message
       );
       setBusinessData({
-        totalBusinesses: 0,
-        categories: {},
+        totalCount: 0,
+        categoryCounts: {},
         address: coords.address,
-        requestedBusiness: businessType || null,
       });
     }
   };
