@@ -8,6 +8,8 @@ function MapArea({ onAreaSelect }) {
   const [searchInput, setSearchInput] = useState("");
   const [businessInput, setBusinessInput] = useState(""); // ✅ new state
   const [filteredCategories, setFilteredCategories] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
 
 
   const mapRef = useRef(null);
