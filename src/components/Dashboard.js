@@ -21,7 +21,7 @@ function Dashboard({ data }) {
   // Sort categories by value (descending)
   const sortedCategories = Object.entries(categories).sort((a, b) => b[1] - a[1]);
 
-  // Only top 5 for chart
+  // ✅ Only top 5 go into the pie chart
   const topCategories = sortedCategories.slice(0, 5).map(([name, value]) => ({
     name,
     value,
@@ -34,24 +34,29 @@ function Dashboard({ data }) {
       <p><strong>Total Businesses:</strong> {totalBusinesses}</p>
 
       {topCategories.length > 0 ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={topCategories}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={120}
-              fill="#c9a227"
-              label
-            >
-              {topCategories.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <>
+          <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
+            Top 5 Business Categories
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={topCategories}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={120}
+                fill="#c9a227"
+                label
+              >
+                {topCategories.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </>
       ) : (
         <p>No business category data available yet.</p>
       )}
