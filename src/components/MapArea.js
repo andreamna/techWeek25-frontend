@@ -41,6 +41,7 @@ function MapArea({ onAreaSelect }) {
       const geocoder = new window.kakao.maps.services.Geocoder();
       geocoderRef.current = geocoder;
 
+      // 지도 클릭 → 역지오코딩 → 부모에 좌표 전달
       window.kakao.maps.event.addListener(map, "click", (mouseEvent) => {
         const latlng = mouseEvent.latLng;
         marker.setPosition(latlng);
@@ -51,7 +52,11 @@ function MapArea({ onAreaSelect }) {
           (result, status) => {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
-              const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
+              const coords = {
+                lat: latlng.getLat(),
+                lng: latlng.getLng(),
+                address,
+              };
               onAreaSelectRef.current?.(coords, businessInput || null);
             }
           }
@@ -59,16 +64,18 @@ function MapArea({ onAreaSelect }) {
       });
     };
 
+    // SDK 로딩
     if (window.kakao?.maps?.services) {
       window.kakao.maps.load(initMap);
     } else {
       const script = document.createElement("script");
       script.src = KAKAO_SDK_URL;
       script.async = true;
-      script.onload = () => window.kakao?.maps && window.kakao.maps.load(initMap);
+      script.onload = () =>
+        window.kakao?.maps && window.kakao.maps.load(initMap);
       document.head.appendChild(script);
     }
-  }, [businessInput]);
+  }, []); // ✅ runs only once
 
   const handleSearch = () => {
     const geocoder = geocoderRef.current;
@@ -93,9 +100,11 @@ function MapArea({ onAreaSelect }) {
           const latlng = new window.kakao.maps.LatLng(lat, lng);
           map.setCenter(latlng);
           marker.setPosition(latlng);
-          const coords = {lat: latlng.getLat(), lng: latlng.getLng(), address};
 
+          const coords = { lat, lng, address };
           onAreaSelectRef.current?.(coords, businessInput || null);
+        } else {
+          console.error("검색 결과가 없습니다.", status);
         }
       },
       { analyzeType: "similar", size: 5 }
@@ -131,7 +140,7 @@ function MapArea({ onAreaSelect }) {
         style={{
           marginBottom: 10,
           display: "flex",
-          gap: "8px",
+          gap: "10px",
           alignItems: "center",
         }}
       >
@@ -141,7 +150,12 @@ function MapArea({ onAreaSelect }) {
           placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
+          style={{
+            padding: 6,
+            width: "220px",
+            height: "38px",
+            boxSizing: "border-box",
+          }}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
 
@@ -152,7 +166,12 @@ function MapArea({ onAreaSelect }) {
             placeholder="업종 입력 (예: 카페, 치킨)"
             value={businessInput}
             onChange={handleBusinessChange}
-            style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
+            style={{
+              padding: 6,
+              width: "220px",
+              height: "38px",
+              boxSizing: "border-box",
+            }}
           />
           {showSuggestions && filteredCategories.length > 0 && (
             <ul
@@ -165,7 +184,7 @@ function MapArea({ onAreaSelect }) {
                 border: "1px solid #ccc",
                 maxHeight: "150px",
                 overflowY: "auto",
-                zIndex: 1000, 
+                zIndex: 1000,
                 listStyle: "none",
                 padding: 0,
                 margin: 0,
@@ -189,7 +208,15 @@ function MapArea({ onAreaSelect }) {
         </div>
 
         {/* Search Button */}
-        <button onClick={handleSearch} style={{ padding: "4px 10px", height: "32px", boxSizing: "border-box", cursor: "pointer", alignSelf: "center" }}>
+        <button
+          onClick={handleSearch}
+          style={{
+            padding: "4px 10px",
+            height: "32px",
+            boxSizing: "border-box",
+            cursor: "pointer",
+          }}
+        >
           Search
         </button>
       </div>
