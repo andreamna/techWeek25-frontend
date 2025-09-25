@@ -131,9 +131,7 @@ function MapArea({ onAreaSelect }) {
           marginBottom: 10,
           display: "flex",
           gap: "8px",
-          alignItems: "flex-start",
-          width: "100%",
-          maxWidth: "600px",
+          alignItems: "center",
         }}
       >
         {/* Address Input */}
@@ -142,7 +140,7 @@ function MapArea({ onAreaSelect }) {
           placeholder="주소 또는 구 입력 (한국어 권장)"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          style={{ padding: 6, width: "220px" }}
+          style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
 
@@ -153,7 +151,7 @@ function MapArea({ onAreaSelect }) {
             placeholder="업종 입력 (예: 카페, 치킨)"
             value={businessInput}
             onChange={handleBusinessChange}
-            style={{ padding: 6, width: "100%" }}
+            style={{ padding: 6, width: "220px", height: "38px", boxSizing: "border-box" }}
           />
           {showSuggestions && filteredCategories.length > 0 && (
             <ul
@@ -166,7 +164,7 @@ function MapArea({ onAreaSelect }) {
                 border: "1px solid #ccc",
                 maxHeight: "150px",
                 overflowY: "auto",
-                zIndex: 2000, // 🔥 ensures it's above the map
+                zIndex: 1000, 
                 listStyle: "none",
                 padding: 0,
                 margin: 0,
@@ -190,7 +188,7 @@ function MapArea({ onAreaSelect }) {
         </div>
 
         {/* Search Button */}
-        <button onClick={handleSearch} style={{ padding: "6px 12px", height: "36px" }}>
+        <button onClick={handleSearch} style={{ padding: "6px 12px", height: "38px", boxSizing: "border-box", cursor: "pointer" }}>
           Search
         </button>
       </div>
