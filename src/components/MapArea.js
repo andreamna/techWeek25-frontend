@@ -127,7 +127,7 @@ function MapArea({ onAreaSelect }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 10, display: "flex", gap: "8px" }}>
+      <div style={{ marginBottom: 10, display: "flex", gap: "8px", flexWrap: "nowrap"}}>
         {/* Address Input */}
         <input
           type="text"
