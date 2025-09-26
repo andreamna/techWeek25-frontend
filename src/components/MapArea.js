@@ -65,7 +65,17 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
             if (status === window.kakao.maps.services.Status.OK && result[0]) {
               const address = result[0].address?.address_name ?? "N/A";
               const coords = { lat: latlng.getLat(), lng: latlng.getLng(), address };
-              onAreaSelectRef.current?.(coords, businessInput || null);
+
+              if (businessInput && businessInput.trim() !== "") {
+                onAreaSelectRef.current?.(coords, businessInput);
+              } else {
+                const confirmSend = window.confirm(
+                  "Only address inputted.\nShow general business data for this area?"
+                );
+                if (confirmSend) {
+                  onAreaSelectRef.current?.(coords, null);
+                }
+              }
             }
           }
         );
@@ -117,7 +127,12 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
           if (businessInput && businessInput.trim() !== "") {
             onAreaSelectRef.current?.(coords, businessInput);
           } else {
-            onAreaSelectRef.current?.(coords, null);
+            const confirmSend = window.confirm(
+              "Only address inputted.\nShow general business data for this area?"
+            );
+            if (confirmSend) {
+              onAreaSelectRef.current?.(coords, null);
+            }
           }
         } else {
           const ps = new window.kakao.maps.services.Places();
@@ -138,7 +153,12 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
                 if (businessInput && businessInput.trim() !== "") {
                   onAreaSelectRef.current?.(coords, businessInput);
                 } else {
-                  onAreaSelectRef.current?.(coords, null);
+                  const confirmSend = window.confirm(
+                    "Only address inputted.\nShow general business data for this area?"
+                  );
+                  if (confirmSend) {
+                    onAreaSelectRef.current?.(coords, null);
+                  }
                 }
               } else {
                 console.error("검색 결과가 없습니다.");
@@ -208,7 +228,9 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
           )}
         </div>
 
-        <label className="label">Radius: <b>{radius.toLocaleString()} m</b></label>
+        <label className="label">
+          Radius: <b>{radius.toLocaleString()} m</b>
+        </label>
         <input
           type="range"
           min="300"
