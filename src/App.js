@@ -14,6 +14,7 @@ function App() {
 
   const handleAreaSelect = async (coords, businessType = "") => {
     try {
+      console.log("Hello from the console!");
       const payload = {
         latitude: coords.lat,
         longitude: coords.lng,
@@ -24,6 +25,10 @@ function App() {
       }
 
       const { data } = await axios.post(API_URL, payload);
+
+      console.log("printing my data!");
+      console.log("Average Congestion: " + data.averageCongestion);
+      console.log("Average Congestion Level" + data.averageCongestionLevel);
 
       setBusinessData({
         ...data,
