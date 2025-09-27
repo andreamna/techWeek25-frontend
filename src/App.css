@@ -171,8 +171,13 @@ body {
 
 .tab-content {
   display: flex;
-  overflow-x: scroll;
+  overflow-x: hidden;
   transition: transform 0.3s ease;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none; 
+}
+.tab-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
 
 .tab-content > div {
