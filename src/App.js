@@ -58,7 +58,7 @@ function App() {
         {/* Left Panel (search + controls live inside MapArea) */}
         <MapArea onAreaSelect={handleAreaSelect} radius={radius} setRadius={setRadius} />
         {/* Right Panel */}
-        <Dashboard data={businessData} />
+        {businessData && <Dashboard data={businessData} />}
       </main>
     </div>
   );
