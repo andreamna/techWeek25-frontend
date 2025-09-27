@@ -27,8 +27,15 @@ function App() {
       const { data } = await axios.post(API_URL, payload);
 
       console.log("printing my data!");
-      console.log("Average Congestion: " + data.averageCongestion);
-      console.log("Average Congestion Level" + data.averageCongestionLevel);
+      console.log("Weekly Rhythm Monday: " + data.congestionData.weeklyRhythm.MON);
+      console.log("Weekly Rhythm Tuesday: " + data.congestionData.weeklyRhythm.TUE);
+      console.log("Weekly Rhythm Wednesday: " + data.congestionData.weeklyRhythm.WED);
+      console.log("Weekly Rhythm Thursday: " + data.congestionData.weeklyRhythm.THU);
+      console.log("Weekly Rhythm Friday: " + data.congestionData.weeklyRhythm.FRI);
+      console.log("Weekly Rhythm Saturday: " + data.congestionData.weeklyRhythm.SAT);
+      console.log("Weekly Rhythm Sunday: " + data.congestionData.weeklyRhythm.SUN);
+
+      console.log("Hourly Breakdown Monday 0 AM" + data.congestionData.hourlyBreakdown.MON[0]);
 
       setBusinessData({
         ...data,
