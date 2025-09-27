@@ -175,16 +175,32 @@ body {
 
 .demographics-metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 metrics side by side */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
 .demographics-charts {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 charts side by side */
+  grid-template-columns: 1fr 1fr; /* 2 side by side on web */
   gap: 20px;
 }
+@media (max-width: 768px) {
+  .demographics-metrics {
+    grid-template-columns: 1fr; /* stack KPIs */
+  }
 
+  .demographics-charts {
+    grid-template-columns: 1fr; /* stack charts */
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .metric-value {
+    font-size: 22px;
+  }
+}
 /* ========= Tabs ========= */
 .data-tabs {
   background: #1f2937; 

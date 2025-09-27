@@ -7,11 +7,11 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  Cell,
   PieChart,
   Pie,
   Legend,
   CartesianGrid,
-  Cell
 } from "recharts";
 
 export default function DemographicsPro({ visitors }) {
@@ -24,7 +24,10 @@ export default function DemographicsPro({ visitors }) {
 
   const totals = useMemo(() => {
     let m = 0, f = 0;
-    data.forEach((d) => { m += d.male; f += d.female; });
+    data.forEach((d) => {
+      m += d.male;
+      f += d.female;
+    });
     return { m, f };
   }, [data]);
 
@@ -37,10 +40,12 @@ export default function DemographicsPro({ visitors }) {
     return <p className="muted">No demographics data available.</p>;
   }
 
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <div className="dash">
+    <div className="dash demographics-section">
       {/* KPI row */}
-      <div className="cards">
+      <div className="cards demographics-metrics">
         <div className="card glass metric">
           <div className="metric-label">Female</div>
           <div className="metric-value">
@@ -59,19 +64,19 @@ export default function DemographicsPro({ visitors }) {
         </div>
       </div>
 
-      {/* Gender Split */}
+      {/* Gender Split (top) */}
       <div className="card chart-card">
         <div className="card-title">Gender Split</div>
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
           <PieChart>
             <defs>
               <linearGradient id="maleGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9}/>
-                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.8}/>
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.6} />
               </linearGradient>
               <linearGradient id="femaleGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="5%" stopColor="#ec4899" stopOpacity={0.9}/>
-                <stop offset="95%" stopColor="#f472b6" stopOpacity={0.8}/>
+                <stop offset="0%" stopColor="#ec4899" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#f472b6" stopOpacity={0.6} />
               </linearGradient>
             </defs>
             <Pie
@@ -80,7 +85,7 @@ export default function DemographicsPro({ visitors }) {
                 { name: "Female", value: totals.f },
               ]}
               dataKey="value"
-              outerRadius={90}
+              outerRadius={isMobile ? 70 : 90}
               label={false}
             >
               <Cell fill="url(#maleGrad)" />
@@ -88,51 +93,49 @@ export default function DemographicsPro({ visitors }) {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1f2937",
-                border: "1px solid rgba(148,163,184,0.2)",
+                background: "#1f2937",
+                border: "1px solid #374151",
                 borderRadius: "8px",
                 color: "#e5e7eb",
+                fontSize: isMobile ? 12 : 14,
               }}
             />
-            <Legend />
+            {!isMobile && <Legend />}
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Age Distribution */}
+      {/* Age Distribution (below) */}
       <div className="card chart-card">
         <div className="card-title">Age Distribution</div>
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 260}>
           <BarChart
             data={data}
             layout="vertical"
-            margin={{ left: 40, right: 20 }}
-            barCategoryGap={20}
+            margin={{ left: isMobile ? 20 : 40, right: 20 }}
+            barCategoryGap={isMobile ? 12 : 20}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <CartesianGrid stroke="#1e293b" />
             <XAxis
               type="number"
-              tick={{ fill: "#e5e7eb", fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
+              tick={{ fill: "#e5e7eb", fontSize: isMobile ? 11 : 12 }}
             />
             <YAxis
               type="category"
               dataKey="age"
-              tick={{ fill: "#e5e7eb", fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
+              tick={{ fill: "#e5e7eb", fontSize: isMobile ? 11 : 12 }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1f2937",
-                border: "1px solid rgba(148,163,184,0.2)",
+                background: "#1f2937",
+                border: "1px solid #374151",
                 borderRadius: "8px",
                 color: "#e5e7eb",
+                fontSize: isMobile ? 12 : 14,
               }}
             />
-            <Bar dataKey="male" name="Male" radius={[6, 6, 6, 6]} fill="url(#maleGrad)" />
-            <Bar dataKey="female" name="Female" radius={[6, 6, 6, 6]} fill="url(#femaleGrad)" />
+            <Bar dataKey="male" fill="url(#maleGrad)" radius={[6, 6, 6, 6]} />
+            <Bar dataKey="female" fill="url(#femaleGrad)" radius={[6, 6, 6, 6]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
