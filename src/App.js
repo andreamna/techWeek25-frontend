@@ -10,17 +10,16 @@ const API_URL = "/api/v1/locations/analysis";
 
 function App() {
   const [businessData, setBusinessData] = useState(null);
-  const [floatingData, setFloatingData] = useState(null);  
+  const [floatingData, setFloatingData] = useState(null);
   const [realEstateData, setRealEstateData] = useState(null);
   const [radius, setRadius] = useState(1000); // meters
 
   const handleAreaSelect = async (coords, businessType = "") => {
     try {
-      console.log("Hello from the console!");
       const payload = {
         latitude: coords.lat,
         longitude: coords.lng,
-        radius, // <- use UI radius
+        radius,
       };
       if (businessType && businessType.trim() !== "") {
         payload.businessType = businessType;
@@ -28,29 +27,47 @@ function App() {
 
       const { data } = await axios.post(API_URL, payload);
 
-      console.log("printing my data!");
-      console.log("Weekly Rhythm Monday: " + data.congestionData.weeklyRhythm.MON);
-      console.log("Weekly Rhythm Tuesday: " + data.congestionData.weeklyRhythm.TUE);
-      console.log("Weekly Rhythm Wednesday: " + data.congestionData.weeklyRhythm.WED);
-      console.log("Weekly Rhythm Thursday: " + data.congestionData.weeklyRhythm.THU);
-      console.log("Weekly Rhythm Friday: " + data.congestionData.weeklyRhythm.FRI);
-      console.log("Weekly Rhythm Saturday: " + data.congestionData.weeklyRhythm.SAT);
-      console.log("Weekly Rhythm Sunday: " + data.congestionData.weeklyRhythm.SUN);
+      // === Competition Index Calculation ===
+      const totalBusinesses = data.totalCount || 0;
+      const avgTraffic =
+        data.congestionData && data.congestionData.weeklyRhythm
+          ? Object.values(data.congestionData.weeklyRhythm).reduce(
+              (a, b) => a + b,
+              0
+            ) /
+            Object.values(data.congestionData.weeklyRhythm).length
+          : 0;
 
-      console.log("Hourly Breakdown Monday 0 AM" + data.congestionData.hourlyBreakdown.MON[0]);
+      const age60plus =
+        (data.visitorsDistribution?.male_60 || 0) +
+        (data.visitorsDistribution?.female_60 || 0) +
+        (data.visitorsDistribution?.male_70_over || 0) +
+        (data.visitorsDistribution?.female_70_over || 0);
 
-      console.log("Percentage of male visitors in their 40s " + data.visitorsDistribution.male_40);
+      // Normalize to 0–100
+      let score = 50;
+      if (avgTraffic > 70) score += 15;
+      if (avgTraffic < 50) score -= 10;
+      if (totalBusinesses > 50) score -= 15;
+      if (totalBusinesses < 20) score += 10;
+      if (age60plus > 50) score -= 5;
+
+      score = Math.max(0, Math.min(100, score)); // clamp 0–100
 
       setBusinessData({
         ...data,
         address: coords.address,
+        competitionScore: score,
       });
 
       setFloatingData(data.congestionData || null);
       setRealEstateData({ message: "Real estate data coming soon" });
-
     } catch (err) {
-      console.error("Error fetching business data:", err.response?.status, err.response?.data || err.message);
+      console.error(
+        "Error fetching business data:",
+        err.response?.status,
+        err.response?.data || err.message
+      );
       setBusinessData(null);
     }
   };
@@ -59,15 +76,17 @@ function App() {
     <div className="app-shell">
       <Header />
       <main className="content-wrap">
-        {/* Left Panel (search + controls live inside MapArea) */}
-        <MapArea onAreaSelect={handleAreaSelect} radius={radius} setRadius={setRadius} />
-        {/* Right Panel */}
-        {businessData && (
-        <DataTabs
-          businessData={businessData}
-          floatingData={floatingData}
-          realEstateData={realEstateData}
+        <MapArea
+          onAreaSelect={handleAreaSelect}
+          radius={radius}
+          setRadius={setRadius}
         />
+        {businessData && (
+          <DataTabs
+            businessData={businessData}
+            floatingData={floatingData}
+            realEstateData={realEstateData}
+          />
         )}
       </main>
     </div>
