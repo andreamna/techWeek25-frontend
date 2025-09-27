@@ -39,6 +39,8 @@ function App() {
 
       console.log("Hourly Breakdown Monday 0 AM" + data.congestionData.hourlyBreakdown.MON[0]);
 
+      console.log("Percentage of male visitors in their 40s " + data.visitorsDistribution.male_40);
+
       setBusinessData({
         ...data,
         address: coords.address,
