@@ -1,12 +1,14 @@
+// src/components/DataTabs.js
 import React, { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import Dashboard from "./Dashboard";
-import "../App.css"
+import FloatingCharts from "./FloatingCharts"; // ✅ new import
+import "../App.css";
 
 function DataTabs({ businessData, floatingData, realEstateData }) {
   const [activeTab, setActiveTab] = useState(0); // 0: Business, 1: Floating, 2: Real Estate
 
-  // Define swipe handlers
+  // Swipe support
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => setActiveTab((prev) => Math.min(prev + 1, 2)),
     onSwipedRight: () => setActiveTab((prev) => Math.max(prev - 1, 0)),
@@ -16,7 +18,7 @@ function DataTabs({ businessData, floatingData, realEstateData }) {
 
   return (
     <div className="data-tabs" {...swipeHandlers}>
-      {/* Tab Buttons */}
+      {/* Tab Header */}
       <div className="tab-header">
         <button
           className={activeTab === 0 ? "active" : ""}
@@ -40,15 +42,8 @@ function DataTabs({ businessData, floatingData, realEstateData }) {
 
       {/* Tab Content */}
       <div className="tab-content">
-        {activeTab === 0 && (
-          <Dashboard data={businessData} />
-        )}
-        {activeTab === 1 && (
-          <div>
-            <h3>Floating Population Data</h3>
-            <pre>{JSON.stringify(floatingData, null, 2)}</pre>
-          </div>
-        )}
+        {activeTab === 0 && <Dashboard data={businessData} />}
+        {activeTab === 1 && <FloatingCharts data={floatingData} />}
         {activeTab === 2 && (
           <div>
             <h3>Real Estate Data</h3>

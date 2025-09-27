@@ -44,7 +44,7 @@ function App() {
         address: coords.address,
       });
 
-      setFloatingData({ message: "Floating population data coming soon" });
+      setFloatingData(data.congestionData || null);
       setRealEstateData({ message: "Real estate data coming soon" });
 
     } catch (err) {
