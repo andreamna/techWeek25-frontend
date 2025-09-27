@@ -132,3 +132,54 @@ body {
   .map-canvas{ height: 320px; }
   .card, .panel{padding: 12;}
 }
+.data-tabs {
+  background: #1f2937; /* dark panel */
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab-header button {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #374151;
+  color: #d1d5db;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.tab-header button:hover {
+  background: #4b5563;
+}
+
+.tab-header button.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.tab-content {
+  display: flex;
+  overflow-x: scroll;
+  transition: transform 0.3s ease;
+}
+
+.tab-content > div {
+  min-width: 100%;
+  flex-shrink: 0;
+}
+
+.tab-content > div:not(:last-child) {
+  margin-right: 16px;
+}

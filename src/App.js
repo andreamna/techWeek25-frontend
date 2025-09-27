@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import Header from "./components/Header";
 import MapArea from "./components/MapArea";
-import Dashboard from "./components/Dashboard";
+import DataTabs from "./components/DataTabs";
 import "./App.css";
 
 const API_URL = "/api/v1/locations/analysis";
 
 function App() {
   const [businessData, setBusinessData] = useState(null);
+  const [floatingData, setFloatingData] = useState(null);  
+  const [realEstateData, setRealEstateData] = useState(null);
   const [radius, setRadius] = useState(1000); // meters
 
   const handleAreaSelect = async (coords, businessType = "") => {
@@ -41,13 +43,13 @@ function App() {
         ...data,
         address: coords.address,
       });
+
+      setFloatingData({ message: "Floating population data coming soon" });
+      setRealEstateData({ message: "Real estate data coming soon" });
+
     } catch (err) {
       console.error("Error fetching business data:", err.response?.status, err.response?.data || err.message);
-      setBusinessData({
-        totalCount: 0,
-        categoryCounts: {},
-        address: coords.address,
-      });
+      setBusinessData(null);
     }
   };
 
@@ -58,7 +60,13 @@ function App() {
         {/* Left Panel (search + controls live inside MapArea) */}
         <MapArea onAreaSelect={handleAreaSelect} radius={radius} setRadius={setRadius} />
         {/* Right Panel */}
-        {businessData && <Dashboard data={businessData} />}
+        {businessData && (
+        <DataTabs
+          businessData={businessData}
+          floatingData={floatingData}
+          realEstateData={realEstateData}
+        />
+        )}
       </main>
     </div>
   );
