@@ -18,6 +18,16 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
     preventDefaultTouchmoveEvent: true, trackMouse:true
   });
 
+    const handleTabClick = (index) => {
+    if (index === 1) { // This is the "Businesses" tab
+      if (!businessData || businessData.totalCount == null || businessData.categoryCounts == null) {
+        window.alert("We are sorry, we are having some problems with our data source.");
+        return; // Stop the function here to prevent switching to the tab
+      }
+    }
+    setActiveTab(index);
+  };
+
   /* ===== Competition breakdown ===== */
   const score = businessData?.competitionScore ?? 0;
   const totalBusinesses = businessData?.totalCount ?? 0;
@@ -60,7 +70,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
     <div className="data-tabs" {...swipeHandlers}>
       <div className="tab-header">
         {["Competition","Businesses","Floating Pop.","Demographics","Real Estate"].map((t,i)=>(
-          <button key={t} className={activeTab===i?"active":""} onClick={()=>setActiveTab(i)}>{t}</button>
+          <button key={t} className={activeTab===i?"active":""} onClick={()=>handleTabClick(i)}>{t}</button>
         ))}
       </div>
 
