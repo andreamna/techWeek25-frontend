@@ -254,3 +254,44 @@ body {
   .map-canvas{ height: 320px; }
   .card, .panel{padding: 12px;}
 }
+/* ========= Competition Responsive ========= */
+@media (max-width: 768px) {
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;   /* stack charts */
+    gap: 16px;
+  }
+}
+
+/* ========= Floating Pop Responsive ========= */
+@media (max-width: 768px) {
+  .floating-charts,
+  .floating-metrics,
+  .floating-kpis,
+  .cards {
+    grid-template-columns: 1fr !important;  /* force single column */
+  }
+
+  .card-title { font-size: 16px; }
+  .metric-value { font-size: 22px; }
+}
+
+/* ========= General Mobile Adjustments ========= */
+@media (max-width: 768px) {
+  .dash {
+    overflow-y: visible;     /* remove inner scroll */
+    max-height: none;
+  }
+
+  .content-wrap {
+    grid-template-columns: 1fr; /* sidebar above, dashboard below */
+  }
+
+  .tab-header {
+    flex-wrap: wrap;   /* ✅ allow tab buttons to wrap nicely */
+  }
+
+  .tab-header button {
+    flex: 1 1 45%;     /* ✅ 2 buttons per row */
+  }
+}

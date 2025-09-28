@@ -8,8 +8,8 @@ import {
 /** Expects: data = { weeklyRhythm, hourlyBreakdown } */
 export default function FloatingPro({ data }) {
   const [series, setSeries] = useState("all"); // 'all'|'weekday'|'weekend'
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  // Always declare defaults first (safe for hooks)
   const days = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
   const weeklyRhythm = data?.weeklyRhythm || {};
   const hourlyBreakdown = data?.hourlyBreakdown || {};
@@ -54,7 +54,6 @@ export default function FloatingPro({ data }) {
     });
   });
 
-  // ✅ Safe conditional render after hooks
   if (!data) {
     return <p className="muted">No floating population data available.</p>;
   }
@@ -90,8 +89,8 @@ export default function FloatingPro({ data }) {
             </button>
           ))}
         </div>
-        <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={hourlyAll}>
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 260}>
+          <AreaChart data={hourlyAll} margin={{ left: isMobile ? -6 : 0, right: isMobile ? 0 : 0 }}>
             <defs>
               <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
@@ -99,8 +98,12 @@ export default function FloatingPro({ data }) {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
-            <XAxis dataKey="hour" interval={2} />
-            <YAxis />
+            <XAxis
+              dataKey="hour"
+              interval={isMobile ? 3 : 2}
+              tick={{ fontSize: isMobile ? 12 : 14 }}
+            />
+            <YAxis tick={{ fontSize: isMobile ? 12 : 14 }} />
             <Tooltip />
             <Area type="monotone" dataKey={activeKey} stroke="#3b82f6" fill="url(#grad)" />
           </AreaChart>
@@ -110,11 +113,11 @@ export default function FloatingPro({ data }) {
       {/* Weekly bars */}
       <div className="card chart-card">
         <div className="card-title">Weekly Traffic</div>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={weekly}>
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 240}>
+          <BarChart data={weekly} margin={{ left: isMobile ? -6 : 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
-            <XAxis dataKey="day" />
-            <YAxis />
+            <XAxis dataKey="day" tick={{ fontSize: isMobile ? 12 : 14 }} />
+            <YAxis tick={{ fontSize: isMobile ? 12 : 14 }} />
             <Tooltip />
             <Bar dataKey="value" fill="#3b82f6" radius={[4,4,0,0]} />
           </BarChart>
@@ -125,7 +128,12 @@ export default function FloatingPro({ data }) {
       <div className="card chart-card">
         <div className="card-title">Traffic Intensity (2-hour blocks)</div>
         <div className="heatmap-wrap">
-          <div className="heatmap-grid" style={{ gridTemplateColumns: "80px repeat(12,1fr)" }}>
+          <div
+            className="heatmap-grid"
+            style={{
+              gridTemplateColumns: isMobile ? "60px repeat(12,1fr)" : "80px repeat(12,1fr)"
+            }}
+          >
             <div></div>
             {blocks.map(b=><div key={b} className="heatmap-h">{b}</div>)}
             {days.map(d=>(

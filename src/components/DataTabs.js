@@ -6,7 +6,7 @@ import FloatingPro from "./FloatingPro";
 import DemographicsPro from "./DemographicsPro";
 import {
   PieChart, Pie, Cell, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts";
 import "../App.css";
 
@@ -18,11 +18,14 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
     preventDefaultTouchmoveEvent: true, trackMouse:true
   });
 
-    const handleTabClick = (index) => {
-    if (index === 1) { // This is the "Businesses" tab
+  // ✅ mobile-only sizing
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const handleTabClick = (index) => {
+    if (index === 1) {
       if (!businessData || businessData.totalCount == null || businessData.categoryCounts == null) {
         window.alert("We are sorry, we are having some problems with our data source.");
-        return; // Stop the function here to prevent switching to the tab
+        return;
       }
     }
     setActiveTab(index);
@@ -55,7 +58,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
     return Math.max(20, 70 - Math.max(0, pct-40));
   }, [businessData]);
 
-  const rentFactor = 50; // placeholder until real-estate is wired
+  const rentFactor = 50;
 
   const breakdown = [
     { name: "Foot Traffic", value: Math.round(trafficFactor) },
@@ -81,7 +84,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
             {/* Donut Gauge */}
             <div className="card chart-card">
               <div className="card-title">Competition Index</div>
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
                 <PieChart>
                   <defs>
                     <linearGradient id="donutGrad" x1="0" x2="1" y1="0" y2="1">
@@ -94,23 +97,17 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
                     dataKey="value"
                     startAngle={180}
                     endAngle={0}
-                    innerRadius={70}
-                    outerRadius={100}
+                    innerRadius={isMobile ? 54 : 70}
+                    outerRadius={isMobile ? 82 : 100}
                     stroke="none"
                   >
                     <Cell key="score" fill="url(#donutGrad)" />
                     <Cell key="remain" fill="rgba(148,163,184,0.2)" />
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: "#1f2937",
-                      border: "1px solid #374151",
-                      color: "var(--text)",
-                    }}
-                  />
+                  <Tooltip contentStyle={{ background: "#1f2937", border: "1px solid #374151", color: "var(--text)" }}/>
                 </PieChart>
               </ResponsiveContainer>
-              <div style={{ textAlign:"center", fontSize:28, fontWeight:800, marginTop:-12 }}>
+              <div style={{ textAlign:"center", fontSize: isMobile ? 24 : 28, fontWeight:800, marginTop:-12 }}>
                 {score}/100
               </div>
               <div className="muted" style={{ textAlign:"center" }}>
@@ -121,12 +118,12 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
             {/* Breakdown Bars */}
             <div className="card chart-card">
               <div className="card-title">What drives this score</div>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={isMobile ? 240 : 260}>
                 <BarChart
                   data={breakdown}
                   layout="vertical"
-                  margin={{ left: 20, right: 20, top: 10, bottom: 10 }}
-                  barCategoryGap={15}
+                  margin={{ left: isMobile ? 12 : 20, right: isMobile ? 10 : 20, top: 4, bottom: 4 }}
+                  barCategoryGap={isMobile ? 10 : 15}
                 >
                   <defs>
                     <linearGradient id="barGrad" x1="0" x2="1" y1="0" y2="0">
@@ -134,28 +131,22 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
                       <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.6} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#374151" vertical={false} /> {/* ✅ subtle solid lines */}
+                  <CartesianGrid stroke="#374151" vertical={false} />
                   <XAxis
                     type="number"
                     domain={[0, 100]}
-                    tick={{ fill: "var(--text)", fontSize: 13 }}
+                    tick={{ fill: "var(--text)", fontSize: isMobile ? 12 : 13 }}
                     axisLine={false}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
-                    tick={{ fill: "var(--text)", fontSize: 14, fontWeight: 600 }}
-                    width={160}
+                    width={isMobile ? 140 : 170}
+                    tick={{ fill: "var(--text)", fontSize: isMobile ? 13 : 14, fontWeight: 600 }}
                     axisLine={false}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#1f2937",
-                      border: "1px solid #374151",
-                      color: "var(--text)",
-                    }}
-                  />
-                  <Bar dataKey="value" fill="url(#barGrad)" radius={[6, 6, 6, 6]} />
+                  <Tooltip contentStyle={{ background: "#1f2937", border: "1px solid #374151", color: "var(--text)" }}/>
+                  <Bar dataKey="value" fill="url(#barGrad)" radius={[8, 8, 8, 8]} />
                 </BarChart>
               </ResponsiveContainer>
               <div className="muted" style={{ marginTop:6 }}>
