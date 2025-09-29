@@ -5,7 +5,11 @@ function Header() {
   return (
     <header className="topbar">
       <div className="brand">
-        <span className="brand-dot" />
+        <img 
+          src="/BizVision_logo3.png" 
+          alt="BizVision Logo" 
+          className="brand-logo"
+        />
         <span className="brand-text">BizVision</span>
       </div>
       <div className="tagline">Check business opportunities in your chosen area.</div>
