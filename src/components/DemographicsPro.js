@@ -36,6 +36,31 @@ export default function DemographicsPro({ visitors }) {
     {}
   );
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const total = payload.reduce((sum, p) => sum + p.value, 0);
+      return (
+        <div style={{
+          background: "#1f2937",
+          border: "1px solid #374151",
+          borderRadius: "8px",
+          padding: "8px 12px",
+          color: "#e5e7eb"
+        }}>
+          <p style={{ margin: 0, fontWeight: 600, marginBottom: 6 }}>
+            {payload[0].payload.age ? `Age ${payload[0].payload.age}` : payload[0].name}
+          </p>
+          {payload.map((p, i) => (
+            <p key={i} style={{ margin: "2px 0", color: p.color }}>
+              {p.name}: {Math.round(p.value)} ({((p.value/total)*100).toFixed(1)}%)
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (!visitors) {
     return <p className="muted">No demographics data available.</p>;
   }
@@ -47,36 +72,36 @@ export default function DemographicsPro({ visitors }) {
       {/* KPI row */}
       <div className="cards demographics-metrics">
         <div className="card glass metric">
-          <div className="metric-label">Female</div>
+          <div className="metric-label">Female Visitors</div>
           <div className="metric-value">
             {((totals.f / (totals.f + totals.m)) * 100).toFixed(1)}%
           </div>
         </div>
         <div className="card glass metric">
-          <div className="metric-label">Male</div>
+          <div className="metric-label">Male Visitors</div>
           <div className="metric-value">
             {((totals.m / (totals.f + totals.m)) * 100).toFixed(1)}%
           </div>
         </div>
         <div className="card glass metric">
-          <div className="metric-label">Top Age Band</div>
+          <div className="metric-label">Top Age Group</div>
           <div className="metric-value">{topAge.age}</div>
         </div>
       </div>
 
-      {/* Gender Split (top) */}
+      {/* Gender Split */}
       <div className="card chart-card">
-        <div className="card-title">Gender Split</div>
-        <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
+        <div className="card-title">Gender Distribution</div>
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 280}>
           <PieChart>
             <defs>
               <linearGradient id="maleGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.6} />
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.85} />
               </linearGradient>
               <linearGradient id="femaleGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#ec4899" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#f472b6" stopOpacity={0.6} />
+                <stop offset="0%" stopColor="#ec4899" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#f472b6" stopOpacity={0.85} />
               </linearGradient>
             </defs>
             <Pie
@@ -85,57 +110,52 @@ export default function DemographicsPro({ visitors }) {
                 { name: "Female", value: totals.f },
               ]}
               dataKey="value"
-              outerRadius={isMobile ? 70 : 90}
-              label={false}
+              outerRadius={isMobile ? 75 : 95}
+              label={({name, percent}) => `${name} ${(percent * 100).toFixed(1)}%`}
+              labelLine={{ stroke: '#94a3b8', strokeWidth: 1 }}
             >
               <Cell fill="url(#maleGrad)" />
               <Cell fill="url(#femaleGrad)" />
             </Pie>
-            <Tooltip
-              contentStyle={{
-                background: "#1f2937",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                color: "#e5e7eb",
-                fontSize: isMobile ? 12 : 14,
-              }}
-            />
-            {!isMobile && <Legend />}
+            <Tooltip content={<CustomTooltip />} />
+            {!isMobile && <Legend 
+              verticalAlign="bottom" 
+              iconType="circle"
+              wrapperStyle={{ paddingTop: 10 }}
+            />}
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Age Distribution (below) */}
+      {/* Age Distribution */}
       <div className="card chart-card">
-        <div className="card-title">Age Distribution</div>
-        <ResponsiveContainer width="100%" height={isMobile ? 220 : 260}>
+        <div className="card-title">Age Distribution by Gender</div>
+        <ResponsiveContainer width="100%" height={isMobile ? 240 : 280}>
           <BarChart
             data={data}
             layout="vertical"
-            margin={{ left: isMobile ? 20 : 40, right: 20 }}
-            barCategoryGap={isMobile ? 12 : 20}
+            margin={{ left: isMobile ? 25 : 45, right: isMobile ? 10 : 20, top: 10, bottom: 0 }}
+            barCategoryGap={isMobile ? 12 : 18}
           >
-            <CartesianGrid stroke="#1e293b" />
+            <CartesianGrid stroke="#374151" horizontal={false} />
             <XAxis
               type="number"
-              tick={{ fill: "#e5e7eb", fontSize: isMobile ? 11 : 12 }}
+              tick={{ fill: "#94a3b8", fontSize: isMobile ? 11 : 12 }}
+              axisLine={{ stroke: "#374151" }}
             />
             <YAxis
               type="category"
               dataKey="age"
-              tick={{ fill: "#e5e7eb", fontSize: isMobile ? 11 : 12 }}
+              tick={{ fill: "#94a3b8", fontSize: isMobile ? 11 : 12 }}
+              axisLine={{ stroke: "#374151" }}
             />
-            <Tooltip
-              contentStyle={{
-                background: "#1f2937",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                color: "#e5e7eb",
-                fontSize: isMobile ? 12 : 14,
-              }}
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              iconType="circle"
+              wrapperStyle={{ paddingTop: 10, fontSize: isMobile ? 12 : 13 }}
             />
-            <Bar dataKey="male" fill="url(#maleGrad)" radius={[6, 6, 6, 6]} />
-            <Bar dataKey="female" fill="url(#femaleGrad)" radius={[6, 6, 6, 6]} />
+            <Bar dataKey="male" fill="url(#maleGrad)" radius={[0, 8, 8, 0]} name="Male" />
+            <Bar dataKey="female" fill="url(#femaleGrad)" radius={[0, 8, 8, 0]} name="Female" />
           </BarChart>
         </ResponsiveContainer>
       </div>
