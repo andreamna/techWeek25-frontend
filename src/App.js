@@ -14,15 +14,24 @@ function App() {
   const [floatingData, setFloatingData] = useState(null);
   const [realEstateData, setRealEstateData] = useState(null);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [loading, setLoading] = useState(false);
 
-  const handleAreaSelect = async (coords) => {
+  const handleAreaSelect = async (coords, businessType = "") => {
     try {
-      const response = await axios.post(API_URL, {
+      setLoading(true);
+
+      const payload = {
         latitude: coords.lat,
         longitude: coords.lng,
         radius: radius,
-      });
+      };
 
+      // Only include category if selected
+      if (businessType && businessType.trim() !== "") {
+        payload.businessType = businessType; // <-- this will be "CE7", "HP8", etc.
+      }
+
+      const response = await axios.post(API_URL, payload);
       const data = response.data;
 
       // Example competition score calculation
@@ -49,6 +58,8 @@ function App() {
       setBusinessData(null);
       setFloatingData(null);
       setRealEstateData(null);
+    } finally {
+      setLoading(false);
     }
   };
 

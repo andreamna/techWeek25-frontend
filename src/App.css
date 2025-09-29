@@ -295,3 +295,30 @@ body {
     flex: 1 1 45%;     /* ✅ 2 buttons per row */
   }
 }
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 400px; /* ensures it's tall enough */
+  color: white;
+  background: #1f2937; /* match your dark theme */
+  border-radius: 8px;
+}
+
+.spinner {
+  border: 6px solid #374151; /* gray */
+  border-top: 6px solid #3b82f6; /* blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

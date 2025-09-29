@@ -209,24 +209,18 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
         />
 
         <label className="label">Business Category (optional)</label>
-        <div className="autocomplete">
-          <input
-            type="text"
-            value={businessInput}
-            onChange={handleBusinessChange}
-            placeholder="e.g., 카페, 치킨"
-            className="input"
-          />
-          {showSuggestions && filteredCategories.length > 0 && (
-            <ul className="autocomplete-list">
-              {filteredCategories.map((cat, idx) => (
-                <li key={idx} className="autocomplete-item" onClick={() => handleSuggestionClick(cat)}>
-                  {cat}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <select
+          value={businessInput}
+          onChange={(e) => setBusinessInput(e.target.value)}
+          className="input"
+        >
+          <option value="">-- 선택 안 함 --</option>
+          {categories.map((cat) => (
+            <option key={cat.code} value={cat.code}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
         <label className="label">
           Radius: <b>{radius.toLocaleString()} m</b>
