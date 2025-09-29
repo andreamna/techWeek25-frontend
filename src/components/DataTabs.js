@@ -3,14 +3,14 @@ import { useSwipeable } from "react-swipeable";
 import Dashboard from "./Dashboard";
 import FloatingPro from "./FloatingPro";
 import DemographicsPro from "./DemographicsPro";
-import RealEstatePro from "./RealEstatePro";   // ✅ now matches export
+import RealEstatePro from "./RealEstatePro";   
 import {
   PieChart, Pie, Cell, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 } from "recharts";
 import "../App.css";
 
-export default function DataTabs({ businessData, floatingData, realEstateData }) {
+export default function DataTabs({ businessData, floatingData, realEstateData, loading }) {
   const [activeTab, setActiveTab] = useState(0);
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => setActiveTab((p)=>Math.min(p+1,4)),
@@ -70,11 +70,18 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
 
   return (
     <div className="data-tabs" {...swipeHandlers}>
-      <div className="tab-header">
-        {["Competition","Businesses","Floating Pop.","Demographics","Real Estate"].map((t,i)=>(
-          <button key={t} className={activeTab===i?"active":""} onClick={()=>handleTabClick(i)}>{t}</button>
-        ))}
+      {loading ? (
+      <div className="loading-panel">
+        <div className="spinner"></div>
+        <p>Loading data, please wait...</p>
       </div>
+    ) : (
+      <>
+        <div className="tab-header">
+          {["Competition","Businesses","Floating Pop.","Demographics","Real Estate"].map((t,i)=>(
+            <button key={t} className={activeTab===i?"active":""} onClick={()=>handleTabClick(i)}>{t}</button>
+          ))}
+        </div>
 
       <div className="tab-content">
         {activeTab===0 && (
@@ -147,6 +154,8 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
         {activeTab===3 && <DemographicsPro visitors={businessData?.visitorsDistribution} />}
         {activeTab===4 && <RealEstatePro data={realEstateData} />}
       </div>
+    </>
+    )}
     </div>
   );
 }

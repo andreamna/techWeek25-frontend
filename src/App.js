@@ -16,7 +16,7 @@ function App() {
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [loading, setLoading] = useState(false);
 
-  const handleAreaSelect = async (coords, businessType = "") => {
+  const handleAreaSelect = async (coords, category = "") => {
     try {
       setLoading(true);
 
@@ -24,12 +24,14 @@ function App() {
         latitude: coords.lat,
         longitude: coords.lng,
         radius: radius,
+        category: category,
       };
 
       // Only include category if selected
-      if (businessType && businessType.trim() !== "") {
-        payload.businessType = businessType; // <-- this will be "CE7", "HP8", etc.
+      if (category && category.trim() !== "") {
+        payload.category = category; // <-- this will be "CE7", "HP8", etc.
       }
+      console.log("Sending request body:", payload);
 
       const response = await axios.post(API_URL, payload);
       const data = response.data;
@@ -77,6 +79,7 @@ function App() {
             businessData={businessData}
             floatingData={floatingData}
             realEstateData={realEstateData}
+            loading={loading}
           />
         )}
       </main>

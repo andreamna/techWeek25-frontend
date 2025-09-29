@@ -215,9 +215,9 @@ function MapArea({ onAreaSelect, radius, setRadius }) {
           className="input"
         >
           <option value="">-- 선택 안 함 --</option>
-          {categories.map((cat) => (
-            <option key={cat.code} value={cat.code}>
-              {cat.name}
+          {categories.map((cat, idx) => (
+            <option key={idx} value={cat}>
+              {cat}
             </option>
           ))}
         </select>
