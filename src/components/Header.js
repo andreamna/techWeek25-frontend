@@ -6,7 +6,7 @@ function Header() {
     <header className="topbar">
       <div className="brand">
         <span className="brand-dot" />
-        <span className="brand-text">BizScope</span>
+        <span className="brand-text">BizVision</span>
       </div>
       <div className="tagline">Check business opportunities in your chosen area.</div>
     </header>
