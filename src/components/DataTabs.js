@@ -1,9 +1,9 @@
-// src/components/DataTabs.js
 import React, { useMemo, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import Dashboard from "./Dashboard";
 import FloatingPro from "./FloatingPro";
 import DemographicsPro from "./DemographicsPro";
+import RealEstatePro from "./RealEstatePro";   // ✅ now matches export
 import {
   PieChart, Pie, Cell, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
@@ -18,12 +18,11 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
     preventDefaultTouchmoveEvent: true, trackMouse:true
   });
 
-  // ✅ mobile-only sizing
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const handleTabClick = (index) => {
     if (index === 1) {
-      if (!businessData || businessData.totalCount == null || businessData.categoryCounts == null) {
+      if (!businessData || !businessData.totalCount || !businessData.categoryCounts) {
         window.alert("We are sorry, we are having some problems with our data source.");
         return;
       }
@@ -78,7 +77,6 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
       </div>
 
       <div className="tab-content">
-        {/* ===== Competition ===== */}
         {activeTab===0 && (
           <div className="grid-2">
             {/* Donut Gauge */}
@@ -132,19 +130,8 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="#374151" vertical={false} />
-                  <XAxis
-                    type="number"
-                    domain={[0, 100]}
-                    tick={{ fill: "var(--text)", fontSize: isMobile ? 12 : 13 }}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={isMobile ? 140 : 170}
-                    tick={{ fill: "var(--text)", fontSize: isMobile ? 13 : 14, fontWeight: 600 }}
-                    axisLine={false}
-                  />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fill: "var(--text)", fontSize: isMobile ? 12 : 13 }} axisLine={false}/>
+                  <YAxis type="category" dataKey="name" width={isMobile ? 140 : 170} tick={{ fill: "var(--text)", fontSize: isMobile ? 13 : 14, fontWeight: 600 }} axisLine={false}/>
                   <Tooltip contentStyle={{ background: "#1f2937", border: "1px solid #374151", color: "var(--text)" }}/>
                   <Bar dataKey="value" fill="url(#barGrad)" radius={[8, 8, 8, 8]} />
                 </BarChart>
@@ -155,23 +142,10 @@ export default function DataTabs({ businessData, floatingData, realEstateData })
             </div>
           </div>
         )}
-
-        {/* ===== Businesses ===== */}
         {activeTab===1 && <Dashboard data={businessData} />}
-
-        {/* ===== Floating Pop ===== */}
         {activeTab===2 && <FloatingPro data={floatingData} />}
-
-        {/* ===== Demographics ===== */}
         {activeTab===3 && <DemographicsPro visitors={businessData?.visitorsDistribution} />}
-
-        {/* ===== Real Estate ===== */}
-        {activeTab===4 && (
-          <div className="card chart-card">
-            <div className="card-title">Real Estate (coming soon)</div>
-            <pre style={{ whiteSpace:"pre-wrap" }}>{JSON.stringify(realEstateData, null, 2)}</pre>
-          </div>
-        )}
+        {activeTab===4 && <RealEstatePro data={realEstateData} />}
       </div>
     </div>
   );
