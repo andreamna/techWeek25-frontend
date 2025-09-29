@@ -51,6 +51,8 @@ function App() {
       setRealEstateData(data.realEstateTrends || null);
 
       console.log("RealEstateData passed to DataTabs:", data.realEstateTrends);
+      console.log ("Feasibility Index:", data.feasibilityIndex);
+      console.log ("Tailored Feasibility Index:", data.tailoredFeasibilityIndex);
     } catch (err) {
       console.error(
         "Error fetching business data:",
