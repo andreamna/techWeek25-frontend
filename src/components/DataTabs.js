@@ -246,108 +246,48 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                   </div>
                 </div>
 
-                {/* Score Breakdown Card - Enhanced */}
+                {/* Score Breakdown - Simple Explanation */}
                 <div className="card chart-card" style={{
                   background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
-                  border: "1px solid rgba(71, 85, 105, 0.3)"
+                  border: "1px solid rgba(71, 85, 105, 0.3)",
+                  padding: "20px"
                 }}>
-                  <div style={{ 
-                    display: "flex", 
-                    alignItems: "center", 
-                    justifyContent: "space-between",
-                    marginBottom: 16 
+                  <div className="card-title" style={{ 
+                    marginBottom: "16px",
+                    fontSize: isMobile ? 18 : 20,
+                    fontWeight: 700
                   }}>
-                    <div className="card-title" style={{ 
-                      margin: 0,
-                      fontSize: isMobile ? 18 : 20,
-                      fontWeight: 700
-                    }}>
-                      Score Breakdown
-                    </div>
-                    <div style={{
-                      fontSize: isMobile ? 11 : 12,
-                      color: "#64748b",
-                      background: "rgba(71, 85, 105, 0.3)",
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      fontWeight: 600
-                    }}>
-                      Out of 100
-                    </div>
+                    Score Breakdown
                   </div>
 
-                  <ResponsiveContainer width="100%" height={isMobile ? 280 : 340}>
-                    <BarChart
-                      data={breakdown}
-                      layout="vertical"
-                      margin={{ left: isMobile ? 20 : 28, right: isMobile ? 16 : 28, top: 20, bottom: 20 }}
-                      barCategoryGap={isMobile ? 18 : 24}
-                    >
-                      <defs>
-                        <linearGradient id="barGrad" x1="0" x2="1" y1="0" y2="0">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                          <stop offset="50%" stopColor="#6366f1" stopOpacity={0.95} />
-                          <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.9} />
-                        </linearGradient>
-                        <filter id="barGlow">
-                          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                          <feMerge>
-                            <feMergeNode in="coloredBlur"/>
-                            <feMergeNode in="SourceGraphic"/>
-                          </feMerge>
-                        </filter>
-                      </defs>
-                      <CartesianGrid 
-                        stroke="rgba(148, 163, 184, 0.08)" 
-                        vertical={false} 
-                        strokeDasharray="3 3" 
-                      />
-                      <XAxis
-                        type="number"
-                        domain={[0, 100]}
-                        tick={{ fill: "#94a3b8", fontSize: isMobile ? 12 : 13, fontWeight: 500 }}
-                        axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
-                        tickFormatter={(value) => `${value}`}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={isMobile ? 140 : 170}
-                        tick={{ fill: "#f1f5f9", fontSize: isMobile ? 13 : 15, fontWeight: 600 }}
-                        axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
-                      />
-                      <Tooltip 
-                        content={<CustomTooltip />} 
-                        cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} 
-                      />
-                      <Bar 
-                        dataKey="value" 
-                        fill="url(#barGrad)" 
-                        radius={[0, 12, 12, 0]}
-                        filter="url(#barGlow)"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {businessData?.scoreType === "Tailored" ? (
+                    <div style={{ lineHeight: 1.8, color: "#e5e7eb" }}>
+                      <p><strong>Foot Traffic (40%)</strong><br/>
+                      People walking through the area, measuring customer flow.</p>
 
-                  {/* Info Footer */}
-                  <div style={{
-                    marginTop: 20,
-                    padding: "12px 16px",
-                    background: "rgba(59, 130, 246, 0.05)",
-                    border: "1px solid rgba(59, 130, 246, 0.15)",
-                    borderRadius: "10px",
-                    textAlign: "center"
-                  }}>
-                    <div style={{
-                      fontSize: isMobile ? 12 : 13,
-                      color: "#94a3b8",
-                      lineHeight: 1.6,
-                      fontWeight: 500
-                    }}>
-                      💡 Higher foot traffic increases score · High business density and rent decrease it
+                      <p><strong>Economic Health (40%)</strong><br/>
+                      Real estate market growth and stability rate.</p>
+
+                      <p><strong>Business Competition (20%)</strong><br/>
+                      Number of businesses already in the area.</p>
+
+                      <p><strong>Audience & Saturation Adjustment</strong><br/>
+                      +15 pts if the right customers are present, or -15 pts if the market is already crowded.</p>
                     </div>
-                  </div>
+                  ) : (
+                    <div style={{ lineHeight: 1.8, color: "#e5e7eb" }}>
+                      <p><strong>Foot Traffic (40%)</strong><br/>
+                      People walking through the area, measuring customer flow.</p>
+
+                      <p><strong>Economic Health (40%)</strong><br/>
+                      Real estate market growth and stability rate.</p>
+
+                      <p><strong>Business Competition (20%)</strong><br/>
+                      Number of businesses already in the area.</p>
+                    </div>
+                  )}
                 </div>
+
               </div>
             )}
             {activeTab === 1 && <Dashboard data={businessData} />}
