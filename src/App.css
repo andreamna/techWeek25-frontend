@@ -482,6 +482,7 @@ body {
 .heatmap-wrap {
   padding: var(--spacing-sm) 0;
   margin-top: var(--spacing-sm);
+  overflow: hidden;
 }
 
 .heatmap-wrap::-webkit-scrollbar {
