@@ -284,12 +284,21 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 100%;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr;   /* stack */
+    gap: var(--spacing-sm);
+  }
 }
 
 .card {
@@ -358,7 +367,7 @@ body {
 /* ========= Charts ========= */
 .chart-card {
   width: 100%;
-  min-height: 400px;
+  min-height: auto;
 }
 
 /* ========= Lists ========= */
@@ -751,6 +760,8 @@ body {
   }
   
   .chart-card {
+    width: 100%;
+    min-width: 0;
     min-height: 340px;
   }
   
