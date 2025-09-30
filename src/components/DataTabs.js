@@ -85,7 +85,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
 
       <div className="tab-content">
         {activeTab===0 && (
-          <>
+          <div className="grid-2">
             {/* Donut Gauge */}
             <div className="card chart-card">
               <div className="card-title">Competition Index</div>
@@ -147,7 +147,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                 Traffic lifts the score; high density / rent pull it down.
               </div>
             </div>
-          </>
+          </div>
         )}
         {activeTab===1 && <Dashboard data={businessData} />}
         {activeTab===2 && <FloatingPro data={floatingData} />}
