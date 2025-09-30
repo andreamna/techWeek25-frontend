@@ -39,6 +39,27 @@ export default function FloatingPro({ data }) {
     SUN: "#ef4444",
   };
 
+  // Gradient interpolation: blue → purple → pink
+  const interpolateColor = (intensity) => {
+    const low = [59, 130, 246];   // blue (#3b82f6)
+    const mid = [139, 92, 246];   // purple (#8b5cf6)
+    const high = [236, 72, 153];  // pink (#ec4899)
+
+    let r, g, b;
+    if (intensity <= 0.5) {
+      const t = intensity / 0.5;
+      r = low[0] + t * (mid[0] - low[0]);
+      g = low[1] + t * (mid[1] - low[1]);
+      b = low[2] + t * (mid[2] - low[2]);
+    } else {
+      const t = (intensity - 0.5) / 0.5;
+      r = mid[0] + t * (high[0] - mid[0]);
+      g = mid[1] + t * (high[1] - mid[1]);
+      b = mid[2] + t * (high[2] - mid[2]);
+    }
+    return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},0.9)`; 
+  };
+
   /* ===== Weekly summary ===== */
   const weekly = days.map((d) => ({
     day: d,
@@ -186,12 +207,12 @@ export default function FloatingPro({ data }) {
           ))}
         </div>
 
-        <ResponsiveContainer width="100%" height={isMobile ? 220 : 260}>
+        <ResponsiveContainer width="100%" height={isMobile ? 180 : 240}>
           <AreaChart
             data={hourlyAll}
             margin={{
-              left: isMobile ? -6 : 0,
-              right: isMobile ? 4 : 8,
+              left: isMobile ? 8 : 16,
+              right: isMobile ? 8 : 16,
               top: 8,
               bottom: 8,
             }}
@@ -210,8 +231,9 @@ export default function FloatingPro({ data }) {
             <XAxis
               dataKey="hour"
               interval={isMobile ? 3 : 2}
-              tick={{ fontSize: isMobile ? 11 : 12, fill: "#94a3b8" }}
+              tick={{ fontSize: isMobile ? 10 : 12, fill: "#94a3b8" }}
               axisLine={{ stroke: "rgba(148,163,184,0.25)" }}
+              allowDataOverflow={false}
             />
             <YAxis
               tick={{ fontSize: isMobile ? 11 : 12, fill: "#94a3b8" }}
@@ -236,7 +258,7 @@ export default function FloatingPro({ data }) {
         <ResponsiveContainer width="100%" height={isMobile ? 220 : 240}>
           <BarChart
             data={weekly}
-            margin={{ left: isMobile ? -6 : 0, top: 8, right: 4, bottom: 8 }}
+            margin={{ left: isMobile ? 8 : 16, top: 8, right: isMobile ? 8 : 16, bottom: 8 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -266,16 +288,14 @@ export default function FloatingPro({ data }) {
       {/* Heatmap */}
       <div className="card chart-card">
         <div className="card-title">Traffic Intensity (2-hour blocks)</div>
-        <div className="muted" style={{ marginBottom: 10 }}>
-          Darker cells = more traffic. Hover for values.
-        </div>
 
         <div className="heatmap-wrap">
           <div
             className="heatmap-grid"
             style={{
+              padding: isMobile ? "0 8px" : "0 16px",
               gridTemplateColumns: isMobile
-                ? "50px repeat(12, 1fr)"
+                ? "35px repeat(12, 1fr)"
                 : "70px repeat(12, 1fr)",
             }}
           >
@@ -303,9 +323,9 @@ export default function FloatingPro({ data }) {
                       className="heat-cell"
                       title={`${d} ${b}: ${Math.round(v)}`}
                       style={{
-                        background: `rgba(59,130,246,${0.18 + intensity * 0.68})`,
+                        background: interpolateColor(intensity),
                         borderRadius: 3,
-                        height: isMobile ? 14 : 18,
+                        height: isMobile ? 12 : 18,
                         transition: "background 0.2s ease",
                       }}
                     />
@@ -315,6 +335,34 @@ export default function FloatingPro({ data }) {
             ))}
           </div>
         </div>
+        <div
+  style={{
+    marginTop: 12,
+    textAlign: "center",
+  }}
+>
+  <div
+    style={{
+      height: 10,
+      borderRadius: 5,
+      marginBottom: 6,
+      background: "linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899)",
+    }}
+  />
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      fontSize: 12,
+      color: "#94a3b8",
+    }}
+  >
+    <span>Low</span>
+    <span>Medium</span>
+    <span>High</span>
+  </div>
+</div>
+
       </div>
     </div>
   );
