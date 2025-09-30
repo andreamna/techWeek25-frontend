@@ -85,7 +85,7 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
 
       <div className="tab-content">
         {activeTab===0 && (
-          <div className="grid-2">
+          <div>
             {/* Donut Gauge */}
             <div className="card chart-card">
               <div className="card-title">Competition Index</div>
@@ -109,25 +109,43 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                     <Cell key="score" fill="url(#donutGrad)" />
                     <Cell key="remain" fill="rgba(148,163,184,0.2)" />
                   </Pie>
-                  <Tooltip contentStyle={{ background: "#1f2937", border: "1px solid #374151", color: "var(--text)" }}/>
+                  <Tooltip
+                    contentStyle={{
+                      background: "#1f2937",
+                      border: "1px solid #374151",
+                      color: "var(--text)",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-              <div style={{ textAlign:"center", fontSize: isMobile ? 24 : 28, fontWeight:800, marginTop:-12 }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  fontSize: isMobile ? 24 : 28,
+                  fontWeight: 800,
+                  marginTop: -12,
+                }}
+              >
                 {score}/100
               </div>
-              <div className="muted" style={{ textAlign:"center" }}>
+              <div className="muted" style={{ textAlign: "center" }}>
                 Higher score = better feasibility for a new business.
               </div>
             </div>
 
             {/* Breakdown Bars */}
             <div className="card chart-card">
-              <div className="card-title">What drives this score</div>
+              <div className="card-title">Score Breakdown</div>
               <ResponsiveContainer width="100%" height={isMobile ? 240 : 260}>
                 <BarChart
                   data={breakdown}
                   layout="vertical"
-                  margin={{ left: isMobile ? 12 : 20, right: isMobile ? 10 : 20, top: 4, bottom: 4 }}
+                  margin={{
+                    left: isMobile ? 12 : 20,
+                    right: isMobile ? 10 : 20,
+                    top: 4,
+                    bottom: 4,
+                  }}
                   barCategoryGap={isMobile ? 10 : 15}
                 >
                   <defs>
@@ -137,13 +155,38 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="#374151" vertical={false} />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fill: "var(--text)", fontSize: isMobile ? 12 : 13 }} axisLine={false}/>
-                  <YAxis type="category" dataKey="name" width={isMobile ? 140 : 170} tick={{ fill: "var(--text)", fontSize: isMobile ? 13 : 14, fontWeight: 600 }} axisLine={false}/>
-                  <Tooltip contentStyle={{ background: "#1f2937", border: "1px solid #374151", color: "var(--text)" }}/>
-                  <Bar dataKey="value" fill="url(#barGrad)" radius={[8, 8, 8, 8]} />
+                  <XAxis
+                    type="number"
+                    domain={[0, 100]}
+                    tick={{ fill: "var(--text)", fontSize: isMobile ? 12 : 13 }}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={isMobile ? 140 : 170}
+                    tick={{
+                      fill: "var(--text)",
+                      fontSize: isMobile ? 13 : 14,
+                      fontWeight: 600,
+                    }}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#1f2937",
+                      border: "1px solid #374151",
+                      color: "var(--text)",
+                    }}
+                  />
+                  <Bar
+                    dataKey="value"
+                    fill="url(#barGrad)"
+                    radius={[8, 8, 8, 8]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
-              <div className="muted" style={{ marginTop:6 }}>
+              <div className="muted" style={{ marginTop: 6 }}>
                 Traffic lifts the score; high density / rent pull it down.
               </div>
             </div>
