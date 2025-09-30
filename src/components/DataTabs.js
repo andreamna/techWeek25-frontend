@@ -72,21 +72,33 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
     { name: "Remaining", value: 100 - score }
   ];
 
+  const getScoreColor = (scoreValue) => {
+    if (scoreValue < 50) return "#ec4899";
+    if (scoreValue < 70) return "#3b82f6";
+    return "#8b5cf6";
+  };
+
+  const getScoreStatus = (scoreValue) => {
+    if (scoreValue < 50) return { text: "Not Recommended", emoji: "❌", bg: "rgba(236, 72, 153, 0.1)" };
+    if (scoreValue < 70) return { text: "Take Your Own Risk", emoji: "⚠️", bg: "rgba(59, 130, 246, 0.1)" };
+    return { text: "Recommended", emoji: "✅", bg: "rgba(139, 92, 246, 0.1)" };
+  };
+
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{
-          background: "rgba(15, 23, 42, 0.95)",
+          background: "rgba(15, 23, 42, 0.98)",
           border: "1px solid rgba(59, 130, 246, 0.3)",
           borderRadius: "12px",
           padding: "12px 16px",
           color: "#f1f5f9",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)"
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)"
         }}>
-          <p style={{ margin: 0, fontWeight: 700, fontSize: 14, marginBottom: 6 }}>
+          <p style={{ margin: 0, fontWeight: 600, fontSize: 13, marginBottom: 4, color: "#94a3b8" }}>
             {payload[0].name}
           </p>
-          <p style={{ margin: 0, color: "#60a5fa", fontSize: 15, fontWeight: 600 }}>
+          <p style={{ margin: 0, color: "#60a5fa", fontSize: 18, fontWeight: 700 }}>
             {Math.round(payload[0].value)}
           </p>
         </div>
@@ -94,6 +106,8 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
     }
     return null;
   };
+
+  const status = getScoreStatus(score);
 
   return (
     <div className="data-tabs" {...swipeHandlers}>
@@ -119,103 +133,219 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
           <div className="tab-content">
             {activeTab === 0 && (
               <div className="dash">
-                {/* Competition Index - Full Width */}
-                <div className="card chart-card">
-                <div className="card-title">Competition Index</div>
-                <div className="gauge-container">
-                  <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
-                    <PieChart>
-                      <Pie
-                        data={donut}
-                        dataKey="value"
-                        startAngle={180}
-                        endAngle={0}
-                        innerRadius={isMobile ? 60 : 85}
-                        outerRadius={isMobile ? 90 : 120}
-                        stroke="none"
-                      >
-                        <Cell
-                          key="score"
-                          fill={
-                            score < 50
-                              ? "#ec4899" // fuchsia (not recommended)
-                              : score < 70
-                              ? "#3b82f6" // blue (risk)
-                              : "#8b5cf6" // purple (recommended)
-                          }
-                        />
-                        <Cell key="remain" fill="rgba(148, 163, 184, 0.1)" />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+                {/* Competition Index Card - Enhanced */}
+                <div className="card chart-card" style={{
+                  background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+                  border: "1px solid rgba(71, 85, 105, 0.3)",
+                  position: "relative",
+                  overflow: "hidden"
+                }}>
+                  {/* Background gradient effect */}
+                  <div style={{
+                    position: "absolute",
+                    top: "-50%",
+                    right: "-50%",
+                    width: "200%",
+                    height: "200%",
+                    background: `radial-gradient(circle, ${getScoreColor(score)}15 0%, transparent 70%)`,
+                    pointerEvents: "none"
+                  }}></div>
 
-                  {/* Score number with % */}
-                  <div
-                    className="gauge-score"
-                    style={{
-                      color:
-                        score < 50
-                          ? "#ec4899"
-                          : score < 70
-                          ? "#3b82f6"
-                          : "#8b5cf6",
-                    }}
-                  >
-                    {score}%
+                  <div className="card-title" style={{ 
+                    position: "relative", 
+                    zIndex: 1,
+                    fontSize: isMobile ? 18 : 20,
+                    fontWeight: 700,
+                    background: `linear-gradient(135deg, ${getScoreColor(score)}, ${getScoreColor(score)}dd)`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    marginBottom: 8
+                  }}>
+                    Competition Index
                   </div>
 
-                  {/* Labels */}
-                  <div className="gauge-label">
-                    {businessData?.scoreType === "Tailored"
-                      ? "Tailored Feasibility Index"
-                      : "General Feasibility Index"}
-                    <br />
-                    {score < 50
-                      ? "Not Recommended ❌ "
-                      : score < 70
-                      ? "Take Your Own Risk ⚠️ "
-                      : "Recommended ✅ "}
+                  <div className="gauge-container" style={{ position: "relative", zIndex: 1 }}>
+                    <ResponsiveContainer width="100%" height={isMobile ? 240 : 320}>
+                      <PieChart>
+                        <defs>
+                          <filter id="glow">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                            <feMerge>
+                              <feMergeNode in="coloredBlur"/>
+                              <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                          </filter>
+                        </defs>
+                        <Pie
+                          data={donut}
+                          dataKey="value"
+                          startAngle={180}
+                          endAngle={0}
+                          innerRadius={isMobile ? 70 : 95}
+                          outerRadius={isMobile ? 100 : 135}
+                          stroke="none"
+                          filter="url(#glow)"
+                        >
+                          <Cell key="score" fill={getScoreColor(score)} />
+                          <Cell key="remain" fill="rgba(148, 163, 184, 0.08)" />
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+
+                    {/* Enhanced Score Display */}
+                    <div
+                      className="gauge-score"
+                      style={{
+                        color: getScoreColor(score),
+                        fontSize: isMobile ? 52 : 72,
+                        fontWeight: 800,
+                        textShadow: `0 0 30px ${getScoreColor(score)}50`,
+                        letterSpacing: "-0.02em"
+                      }}
+                    >
+                      {score}%
+                    </div>
+
+                    {/* Status Badge */}
+                    <div style={{
+                      position: "absolute",
+                      bottom: isMobile ? "20px" : "40px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      textAlign: "center",
+                      width: "90%"
+                    }}>
+                      <div style={{
+                        display: "inline-block",
+                        background: status.bg,
+                        border: `1px solid ${getScoreColor(score)}40`,
+                        borderRadius: "12px",
+                        padding: isMobile ? "8px 16px" : "10px 24px",
+                        marginBottom: 8
+                      }}>
+                        <div style={{
+                          fontSize: isMobile ? 11 : 12,
+                          color: "#94a3b8",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          marginBottom: 4
+                        }}>
+                          {businessData?.scoreType === "Tailored" ? "Tailored" : "General"} Feasibility
+                        </div>
+                        <div style={{
+                          fontSize: isMobile ? 14 : 16,
+                          color: getScoreColor(score),
+                          fontWeight: 700
+                        }}>
+                          {status.emoji} {status.text}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-                {/* Score Breakdown - Full Width */}
-                <div className="card chart-card">
-                  <div className="card-title">Score Breakdown</div>
-                  <ResponsiveContainer width="100%" height={isMobile ? 260 : 320}>
+                {/* Score Breakdown Card - Enhanced */}
+                <div className="card chart-card" style={{
+                  background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
+                  border: "1px solid rgba(71, 85, 105, 0.3)"
+                }}>
+                  <div style={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "space-between",
+                    marginBottom: 16 
+                  }}>
+                    <div className="card-title" style={{ 
+                      margin: 0,
+                      fontSize: isMobile ? 18 : 20,
+                      fontWeight: 700
+                    }}>
+                      Score Breakdown
+                    </div>
+                    <div style={{
+                      fontSize: isMobile ? 11 : 12,
+                      color: "#64748b",
+                      background: "rgba(71, 85, 105, 0.3)",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      fontWeight: 600
+                    }}>
+                      Out of 100
+                    </div>
+                  </div>
+
+                  <ResponsiveContainer width="100%" height={isMobile ? 280 : 340}>
                     <BarChart
                       data={breakdown}
                       layout="vertical"
-                      margin={{ left: isMobile ? 16 : 24, right: isMobile ? 12 : 24, top: 16, bottom: 16 }}
-                      barCategoryGap={isMobile ? 14 : 20}
+                      margin={{ left: isMobile ? 20 : 28, right: isMobile ? 16 : 28, top: 20, bottom: 20 }}
+                      barCategoryGap={isMobile ? 18 : 24}
                     >
                       <defs>
                         <linearGradient id="barGrad" x1="0" x2="1" y1="0" y2="0">
                           <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                          <stop offset="50%" stopColor="#6366f1" stopOpacity={0.95} />
                           <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.9} />
                         </linearGradient>
+                        <filter id="barGlow">
+                          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
                       </defs>
-                      <CartesianGrid stroke="rgba(148, 163, 184, 0.1)" vertical={false} strokeDasharray="3 3" />
+                      <CartesianGrid 
+                        stroke="rgba(148, 163, 184, 0.08)" 
+                        vertical={false} 
+                        strokeDasharray="3 3" 
+                      />
                       <XAxis
                         type="number"
                         domain={[0, 100]}
-                        tick={{ fill: "#94a3b8", fontSize: isMobile ? 12 : 13 }}
+                        tick={{ fill: "#94a3b8", fontSize: isMobile ? 12 : 13, fontWeight: 500 }}
                         axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
                         tickFormatter={(value) => `${value}`}
                       />
                       <YAxis
                         type="category"
                         dataKey="name"
-                        width={isMobile ? 130 : 160}
-                        tick={{ fill: "#f1f5f9", fontSize: isMobile ? 13 : 14, fontWeight: 600 }}
+                        width={isMobile ? 140 : 170}
+                        tick={{ fill: "#f1f5f9", fontSize: isMobile ? 13 : 15, fontWeight: 600 }}
                         axisLine={{ stroke: "rgba(148, 163, 184, 0.2)" }}
                       />
-                      <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} />
-                      <Bar dataKey="value" fill="url(#barGrad)" radius={[0, 10, 10, 0]} />
+                      <Tooltip 
+                        content={<CustomTooltip />} 
+                        cursor={{ fill: "rgba(59, 130, 246, 0.05)" }} 
+                      />
+                      <Bar 
+                        dataKey="value" 
+                        fill="url(#barGrad)" 
+                        radius={[0, 12, 12, 0]}
+                        filter="url(#barGlow)"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
-                  <div className="muted" style={{ marginTop: 16, textAlign: 'center', lineHeight: 1.6 }}>
-                    Traffic increases score; high density and rent decrease it
+
+                  {/* Info Footer */}
+                  <div style={{
+                    marginTop: 20,
+                    padding: "12px 16px",
+                    background: "rgba(59, 130, 246, 0.05)",
+                    border: "1px solid rgba(59, 130, 246, 0.15)",
+                    borderRadius: "10px",
+                    textAlign: "center"
+                  }}>
+                    <div style={{
+                      fontSize: isMobile ? 12 : 13,
+                      color: "#94a3b8",
+                      lineHeight: 1.6,
+                      fontWeight: 500
+                    }}>
+                      💡 Higher foot traffic increases score · High business density and rent decrease it
+                    </div>
                   </div>
                 </div>
               </div>
