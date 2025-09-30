@@ -36,13 +36,18 @@ function App() {
       const response = await axios.post(API_URL, payload);
       const data = response.data;
 
-      // Example competition score calculation
-      const score = Math.max(0, Math.min(100, data.competitionIndex ?? 0));
+      let score;
+      if (category && category.trim() !== "") {
+        score = Math.max(0, Math.min(100, data.tailoredFeasibilityIndex ?? 0));
+      } else {
+        score = Math.max(0, Math.min(100, data.feasibilityIndex ?? 0));
+      }
 
       setBusinessData({
-        ...data,
         address: coords.address,
+        scoreType: category && category.trim() !== "" ? "Tailored" : "General",
         competitionScore: score,
+        ...data,
       });
 
       setFloatingData(data.congestionData || null);
