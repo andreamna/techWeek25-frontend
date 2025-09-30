@@ -1,3 +1,4 @@
+// src/components/Dashboard.js
 import { useMemo, useState } from "react";
 import {
   ResponsiveContainer,
@@ -17,7 +18,7 @@ const CHART_COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ec4899"];
 
 function Dashboard({ data }) {
   const [showAll, setShowAll] = useState(false);
-  const [chartType, setChartType] = useState("bar");
+  const [chartType, setChartType] = useState("pie"); // ✅ start with pie
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
@@ -85,10 +86,10 @@ function Dashboard({ data }) {
         <div className="card-title">
           Top 5 Categories
           <button
-            onClick={() => setChartType((p) => (p === "bar" ? "pie" : "bar"))}
+            onClick={() => setChartType((p) => (p === "pie" ? "bar" : "pie"))} // ✅ toggle reversed
             className="btn-ghost"
           >
-            Switch to {chartType === "bar" ? "Pie" : "Bar"}
+            Switch to {chartType === "pie" ? "Bar" : "Pie"} {/* ✅ label reversed */}
           </button>
         </div>
 
