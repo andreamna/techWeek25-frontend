@@ -12,8 +12,8 @@ import {
 } from "recharts";
 
 export default function RealEstatePro({ data }) {
-  const commercial = data?.COMMERCIAL || [];
-  const office = data?.OFFICE || [];
+  const commercial = data?.commercial || [];
+  const office = data?.office || [];
 
   // ✅ Always run hooks first
   const merged = useMemo(() => {
