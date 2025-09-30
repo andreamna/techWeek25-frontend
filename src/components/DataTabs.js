@@ -207,10 +207,10 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                       {score}%
                     </div>
 
-                    {/* Status Badge */}
+                    {/* Status Badge - More spacing from percentage */}
                     <div style={{
                       position: "absolute",
-                      bottom: isMobile ? "20px" : "40px",
+                      bottom: isMobile ? "10px" : "20px",
                       left: "50%",
                       transform: "translateX(-50%)",
                       textAlign: "center",
@@ -218,26 +218,28 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                     }}>
                       <div style={{
                         display: "inline-block",
-                        background: status.bg,
-                        border: `1px solid ${getScoreColor(score)}40`,
-                        borderRadius: "12px",
-                        padding: isMobile ? "8px 16px" : "10px 24px",
-                        marginBottom: 8
+                        background: `linear-gradient(135deg, ${status.bg}, ${getScoreColor(score)}08)`,
+                        border: `1.5px solid ${getScoreColor(score)}50`,
+                        borderRadius: "16px",
+                        padding: isMobile ? "10px 18px" : "12px 28px",
+                        marginBottom: 8,
+                        boxShadow: `0 4px 20px ${getScoreColor(score)}20`
                       }}>
                         <div style={{
-                          fontSize: isMobile ? 11 : 12,
+                          fontSize: isMobile ? 10 : 11,
                           color: "#94a3b8",
                           fontWeight: 600,
                           textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          marginBottom: 4
+                          letterSpacing: "0.08em",
+                          marginBottom: 6
                         }}>
                           {businessData?.scoreType === "Tailored" ? "Tailored" : "General"} Feasibility
                         </div>
                         <div style={{
-                          fontSize: isMobile ? 14 : 16,
+                          fontSize: isMobile ? 15 : 17,
                           color: getScoreColor(score),
-                          fontWeight: 700
+                          fontWeight: 700,
+                          letterSpacing: "-0.01em"
                         }}>
                           {status.emoji} {status.text}
                         </div>
@@ -246,44 +248,174 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                   </div>
                 </div>
 
-                {/* Score Breakdown - Simple Explanation */}
+                {/* Score Breakdown - Enhanced Text Display */}
                 <div className="card chart-card" style={{
                   background: "linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%)",
                   border: "1px solid rgba(71, 85, 105, 0.3)",
-                  padding: "20px"
+                  padding: isMobile ? "20px" : "24px"
                 }}>
                   <div className="card-title" style={{ 
-                    marginBottom: "16px",
+                    marginBottom: "20px",
                     fontSize: isMobile ? 18 : 20,
-                    fontWeight: 700
+                    fontWeight: 700,
+                    background: "linear-gradient(135deg, #60a5fa, #a78bfa)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text"
                   }}>
                     Score Breakdown
                   </div>
 
                   {businessData?.scoreType === "Tailored" ? (
-                    <div style={{ lineHeight: 1.8, color: "#e5e7eb" }}>
-                      <p><strong>Foot Traffic (40%)</strong><br/>
-                      People walking through the area, measuring customer flow.</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div style={{
+                        background: "rgba(59, 130, 246, 0.06)",
+                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#60a5fa",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          🚶 Foot Traffic <span style={{ color: "#64748b", fontWeight: 600 }}>(40%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          People walking through the area, measuring customer flow.
+                        </div>
+                      </div>
 
-                      <p><strong>Economic Health (40%)</strong><br/>
-                      Real estate market growth and stability rate.</p>
+                      <div style={{
+                        background: "rgba(139, 92, 246, 0.06)",
+                        border: "1px solid rgba(139, 92, 246, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#a78bfa",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          💰 Economic Health <span style={{ color: "#64748b", fontWeight: 600 }}>(40%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          Real estate market growth and stability rate.
+                        </div>
+                      </div>
 
-                      <p><strong>Business Competition (20%)</strong><br/>
-                      Number of businesses already in the area.</p>
+                      <div style={{
+                        background: "rgba(236, 72, 153, 0.06)",
+                        border: "1px solid rgba(236, 72, 153, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#ec4899",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          🏢 Business Competition <span style={{ color: "#64748b", fontWeight: 600 }}>(20%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          Number of businesses already in the area.
+                        </div>
+                      </div>
 
-                      <p><strong>Audience & Saturation Adjustment</strong><br/>
-                      +15 pts if the right customers are present, or -15 pts if the market is already crowded.</p>
+                      <div style={{
+                        background: "rgba(234, 179, 8, 0.06)",
+                        border: "1px solid rgba(234, 179, 8, 0.25)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#fbbf24",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          🎯 Audience & Saturation Adjustment
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          <span style={{ color: "#86efac" }}>+15 pts</span> if the right customers are present, or <span style={{ color: "#fca5a5" }}>-15 pts</span> if the market is already crowded.
+                        </div>
+                      </div>
                     </div>
                   ) : (
-                    <div style={{ lineHeight: 1.8, color: "#e5e7eb" }}>
-                      <p><strong>Foot Traffic (40%)</strong><br/>
-                      People walking through the area, measuring customer flow.</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div style={{
+                        background: "rgba(59, 130, 246, 0.06)",
+                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#60a5fa",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          🚶 Foot Traffic <span style={{ color: "#64748b", fontWeight: 600 }}>(40%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          People walking through the area, measuring customer flow.
+                        </div>
+                      </div>
 
-                      <p><strong>Economic Health (40%)</strong><br/>
-                      Real estate market growth and stability rate.</p>
+                      <div style={{
+                        background: "rgba(139, 92, 246, 0.06)",
+                        border: "1px solid rgba(139, 92, 246, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#a78bfa",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          💰 Economic Health <span style={{ color: "#64748b", fontWeight: 600 }}>(40%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          Real estate market growth and stability rate.
+                        </div>
+                      </div>
 
-                      <p><strong>Business Competition (20%)</strong><br/>
-                      Number of businesses already in the area.</p>
+                      <div style={{
+                        background: "rgba(236, 72, 153, 0.06)",
+                        border: "1px solid rgba(236, 72, 153, 0.2)",
+                        borderRadius: "12px",
+                        padding: isMobile ? "14px 16px" : "16px 20px",
+                        transition: "all 0.3s ease"
+                      }}>
+                        <div style={{ 
+                          fontSize: isMobile ? 15 : 16, 
+                          fontWeight: 700, 
+                          color: "#ec4899",
+                          marginBottom: "6px",
+                          letterSpacing: "-0.01em"
+                        }}>
+                          🏢 Business Competition <span style={{ color: "#64748b", fontWeight: 600 }}>(20%)</span>
+                        </div>
+                        <div style={{ fontSize: isMobile ? 13 : 14, color: "#cbd5e1", lineHeight: 1.6 }}>
+                          Number of businesses already in the area.
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
