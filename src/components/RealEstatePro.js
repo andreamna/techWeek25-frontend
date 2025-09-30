@@ -67,7 +67,6 @@ export default function RealEstatePro({ data }) {
           />
           <Legend />
           <Line type="monotone" dataKey="COMMERCIAL" stroke="#3b82f6" dot={false} />
-          <Line type="monotone" dataKey="OFFICE" stroke="#22d3ee" dot={false} />
         </LineChart>
       </ResponsiveContainer>
       <div className="muted" style={{ marginTop: "6px" }}>

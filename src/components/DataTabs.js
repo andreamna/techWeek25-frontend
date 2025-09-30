@@ -159,7 +159,9 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
                     <div className="gauge-score">{score}</div>
                     <div className="gauge-label">
                       out of 100<br />
-                      Higher score = better feasibility for a new business
+                      {businessData?.scoreType === "Tailored"
+                        ? "Tailored Feasibility Index"
+                        : "General Feasibility Index"}
                     </div>
                   </div>
                 </div>
