@@ -566,10 +566,6 @@ body {
   transform: translate(-50%, -25%);
   font-size: var(--font-size-4xl);
   font-weight: 900;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   letter-spacing: -1px;
 }
 
@@ -577,7 +573,7 @@ body {
   margin-top: var(--spacing-lg);
   text-align: center;
   color: var(--muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   line-height: 1.8;
   max-width: 300px;
 }

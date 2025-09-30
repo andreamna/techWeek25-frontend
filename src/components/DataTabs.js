@@ -121,50 +121,63 @@ export default function DataTabs({ businessData, floatingData, realEstateData, l
               <div className="dash">
                 {/* Competition Index - Full Width */}
                 <div className="card chart-card">
-                  <div className="card-title">Competition Index</div>
-                  <div className="gauge-container">
-                    <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
-                      <PieChart>
-                        <defs>
-                          <linearGradient id="donutGrad" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.9} />
-                          </linearGradient>
-                        </defs>
-                        <Pie
-                          data={donut}
-                          dataKey="value"
-                          startAngle={180}
-                          endAngle={0}
-                          innerRadius={isMobile ? 60 : 85}
-                          outerRadius={isMobile ? 90 : 120}
-                          stroke="none"
-                        >
-                          <Cell key="score" fill="url(#donutGrad)" />
-                          <Cell key="remain" fill="rgba(148, 163, 184, 0.1)" />
-                        </Pie>
-                        <Tooltip
-                          formatter={(value) => [Math.round(value), "Score"]}
-                          contentStyle={{
-                            background: "rgba(15, 23, 42, 0.95)",
-                            border: "1px solid rgba(59, 130, 246, 0.3)",
-                            color: "#f1f5f9",
-                            borderRadius: "12px",
-                            fontSize: 14,
-                            fontWeight: 600
-                          }}
+                <div className="card-title">Competition Index</div>
+                <div className="gauge-container">
+                  <ResponsiveContainer width="100%" height={isMobile ? 220 : 300}>
+                    <PieChart>
+                      <Pie
+                        data={donut}
+                        dataKey="value"
+                        startAngle={180}
+                        endAngle={0}
+                        innerRadius={isMobile ? 60 : 85}
+                        outerRadius={isMobile ? 90 : 120}
+                        stroke="none"
+                      >
+                        <Cell
+                          key="score"
+                          fill={
+                            score < 50
+                              ? "#ec4899" // fuchsia (not recommended)
+                              : score < 70
+                              ? "#3b82f6" // blue (risk)
+                              : "#8b5cf6" // purple (recommended)
+                          }
                         />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="gauge-score">{score}</div>
-                    <div className="gauge-label">
-                      out of 100<br />
-                      {businessData?.scoreType === "Tailored"
-                        ? "Tailored Feasibility Index"
-                        : "General Feasibility Index"}
-                    </div>
+                        <Cell key="remain" fill="rgba(148, 163, 184, 0.1)" />
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Score number with % */}
+                  <div
+                    className="gauge-score"
+                    style={{
+                      color:
+                        score < 50
+                          ? "#ec4899"
+                          : score < 70
+                          ? "#3b82f6"
+                          : "#8b5cf6",
+                    }}
+                  >
+                    {score}%
+                  </div>
+
+                  {/* Labels */}
+                  <div className="gauge-label">
+                    {businessData?.scoreType === "Tailored"
+                      ? "Tailored Feasibility Index"
+                      : "General Feasibility Index"}
+                    <br />
+                    {score < 50
+                      ? "Not Recommended ❌ "
+                      : score < 70
+                      ? "Take Your Own Risk ⚠️ "
+                      : "Recommended ✅ "}
                   </div>
                 </div>
+              </div>
 
                 {/* Score Breakdown - Full Width */}
                 <div className="card chart-card">
