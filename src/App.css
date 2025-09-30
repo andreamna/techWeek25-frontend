@@ -668,6 +668,12 @@ body {
   gap: var(--spacing-lg);
 }
 
+.grid-2 > *,
+.card,
+.chart-card {
+  min-width: 0;
+}
+
 /* ========= Responsive Design ========= */
 @media (min-width: 1200px) {
   .grid-2 {
